@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from "recharts";
 import { lgaData, curriculumData, subjects, getReadiness, performanceData } from "@/data/kebbiData";
+import ExportButton from "@/components/ExportButton";
+import { exportToCSV } from "@/lib/csvExport";
 
 const getCellColor = (val: string) => {
   if (val === "Yes") return "bg-secondary/20 text-secondary font-semibold";
@@ -22,6 +24,20 @@ const AcademicHealthTab = () => {
     year: y,
     ...Object.fromEntries(Object.entries(performanceData.subjectTrend).map(([sub, vals]) => [sub, vals[i]])),
   }));
+
+  const handleCurriculumExport = () => {
+    exportToCSV("kebbi_curriculum_coverage",
+      ["LGA", ...subjects, "Readiness %"],
+      lgaData.map(l => [l.name, ...subjects.map(s => curriculumData[l.name]?.[s] || "No"), getReadiness(l.name)])
+    );
+  };
+
+  const handleDecliningExport = () => {
+    exportToCSV("kebbi_declining_lgas",
+      ["LGA", "2022%", "2023%", "2024%", "Change%", "Action Needed"],
+      performanceData.decliningLGAs.map(d => [d.lga, d.y2022, d.y2023, d.y2024, d.change, d.action])
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -47,6 +63,10 @@ const AcademicHealthTab = () => {
       {subTab === "curriculum" && (
         <div className="space-y-4">
           <div className="bg-card rounded-md shadow-sm overflow-x-auto">
+            <div className="flex items-center justify-between p-4 pb-2">
+              <h3 className="font-display font-semibold text-sm text-card-foreground">Curriculum Coverage Grid</h3>
+              <ExportButton onClick={handleCurriculumExport} label="Export Curriculum" />
+            </div>
             <table className="w-full text-sm font-body">
               <thead>
                 <tr className="bg-muted text-left">
@@ -124,7 +144,10 @@ const AcademicHealthTab = () => {
           </div>
 
           <div className="bg-card rounded-md shadow-sm overflow-x-auto">
-            <h3 className="font-display font-semibold text-sm p-4 pb-2 text-card-foreground">Declining LGAs — Action Needed</h3>
+            <div className="flex items-center justify-between p-4 pb-2">
+              <h3 className="font-display font-semibold text-sm text-card-foreground">Declining LGAs — Action Needed</h3>
+              <ExportButton onClick={handleDecliningExport} label="Export Declining LGAs" />
+            </div>
             <table className="w-full text-sm font-body">
               <thead>
                 <tr className="bg-muted text-left">

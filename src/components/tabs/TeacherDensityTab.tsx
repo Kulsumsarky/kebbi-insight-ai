@@ -1,5 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { lgaData } from "@/data/kebbiData";
+import ExportButton from "@/components/ExportButton";
+import { exportToCSV } from "@/lib/csvExport";
 
 const getDensityColor = (density: number) => {
   if (density >= 18) return "#0f4a1e";
@@ -29,16 +31,33 @@ const TeacherDensityTab = () => {
     ratio: Math.round(l.disabledStudents / l.senTeachers),
   }));
 
+  const handleDensityExport = () => {
+    exportToCSV("kebbi_teacher_density",
+      ["LGA", "Teachers", "Students", "Density (per 1000)"],
+      lgaData.map(l => [l.name, l.teachers, l.students, Math.round((l.teachers / l.students) * 1000)])
+    );
+  };
+
+  const handleSenExport = () => {
+    exportToCSV("kebbi_sen_ratios",
+      ["LGA", "SEN Teachers", "Disabled Students", "Ratio", "Status"],
+      senTable.map(s => [s.name, s.senTeachers, s.disabled, `1:${s.ratio}`, getSenStatus(s.ratio).label])
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="font-display font-semibold text-sm mb-3 text-foreground">Teacher Density Heatmap — Teachers per 1,000 Students</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-display font-semibold text-sm text-foreground">Teacher Density Heatmap — Teachers per 1,000 Students</h3>
+          <ExportButton onClick={handleDensityExport} label="Export Density" />
+        </div>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2">
           {tiles.map(t => (
             <div
               key={t.name}
-              className="rounded-md p-3 text-center"
-              style={{ backgroundColor: getDensityColor(t.density), color: t.density >= 7 ? "#fff" : "#fff" }}
+              className="rounded-md p-3 text-center transition-transform duration-200 hover:scale-105"
+              style={{ backgroundColor: getDensityColor(t.density), color: "#fff" }}
             >
               <p className="text-[10px] font-display font-bold leading-tight">{t.name}</p>
               <p className="text-lg font-display font-bold">{t.density}</p>
@@ -71,7 +90,10 @@ const TeacherDensityTab = () => {
         <div className="bg-card rounded-md p-4 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-display font-semibold text-sm text-card-foreground">SEN Teacher Ratio by LGA</h3>
-            <span className="text-[10px] font-display font-semibold px-2 py-0.5 rounded-full bg-destructive text-destructive-foreground">Recommended max: 1:25</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-display font-semibold px-2 py-0.5 rounded-full bg-destructive text-destructive-foreground">Recommended max: 1:25</span>
+              <ExportButton onClick={handleSenExport} label="Export SEN" />
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm font-body">

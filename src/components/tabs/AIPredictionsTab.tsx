@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Area, AreaChart, ReferenceLine } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Area, AreaChart } from "recharts";
 import { aiPredictions } from "@/data/kebbiData";
-import { AlertTriangle, TrendingDown, Sparkles } from "lucide-react";
+import { AlertTriangle, TrendingDown, Sparkles, Printer } from "lucide-react";
+import ExportButton from "@/components/ExportButton";
+import { exportToCSV } from "@/lib/csvExport";
 
 const AIPredictionsTab = () => {
   const [showModal, setShowModal] = useState(false);
@@ -17,6 +19,17 @@ const AIPredictionsTab = () => {
     "SEN Ratio": aiPredictions.senRatio.actual[i],
     Recommended: aiPredictions.senRatio.recommended[i],
   }));
+
+  const handleInterventionsExport = () => {
+    exportToCSV("kebbi_ai_interventions",
+      ["LGA", "Priority", "Gap Type", "Recommended Action", "Impact"],
+      aiPredictions.interventions.map(r => [r.lga, r.priority, r.gapType, r.action, r.impact])
+    );
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   return (
     <div className="space-y-6">
@@ -36,15 +49,15 @@ const AIPredictionsTab = () => {
 
       {/* Forecast cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-card rounded-md p-4 shadow-sm border-t-4 border-t-accent">
+        <div className="bg-card rounded-md p-4 shadow-sm border-t-4 border-t-accent transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
           <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Predicted Teacher Shortage 2026</p>
           <p className="text-2xl font-display font-bold text-destructive mt-1">+1,240</p>
         </div>
-        <div className="bg-card rounded-md p-4 shadow-sm border-t-4 border-t-accent">
+        <div className="bg-card rounded-md p-4 shadow-sm border-t-4 border-t-accent transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
           <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">SEN Ratio by 2026</p>
           <p className="text-2xl font-display font-bold text-destructive mt-1">1:73</p>
         </div>
-        <div className="bg-card rounded-md p-4 shadow-sm border-t-4 border-t-accent">
+        <div className="bg-card rounded-md p-4 shadow-sm border-t-4 border-t-accent transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
           <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Vocational Readiness</p>
           <p className="text-2xl font-display font-bold text-accent mt-1">34%</p>
         </div>
@@ -83,7 +96,10 @@ const AIPredictionsTab = () => {
 
       {/* Interventions table */}
       <div className="bg-card rounded-md shadow-sm overflow-x-auto">
-        <h3 className="font-display font-semibold text-sm p-4 pb-2 text-card-foreground">AI Intervention Recommendations</h3>
+        <div className="flex items-center justify-between p-4 pb-2">
+          <h3 className="font-display font-semibold text-sm text-card-foreground">AI Intervention Recommendations</h3>
+          <ExportButton onClick={handleInterventionsExport} label="Export Interventions" />
+        </div>
         <table className="w-full text-sm font-body">
           <thead>
             <tr className="bg-muted text-left">
@@ -114,8 +130,8 @@ const AIPredictionsTab = () => {
         </table>
       </div>
 
-      {/* Generate AI Report button */}
-      <div className="flex flex-col items-center gap-3">
+      {/* Action buttons */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <button
           onClick={() => setShowModal(true)}
           className="bg-accent text-accent-foreground px-6 py-3 rounded-md font-display font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2"
@@ -123,10 +139,17 @@ const AIPredictionsTab = () => {
           <Sparkles className="w-4 h-4" />
           Generate AI Report
         </button>
-        <p className="text-[10px] text-muted-foreground font-body text-center max-w-md">
-          Forecasts generated via time-series modelling (Make.com AI connector). All predictions are estimates.
-        </p>
+        <button
+          onClick={handlePrint}
+          className="bg-primary text-primary-foreground px-6 py-3 rounded-md font-display font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2"
+        >
+          <Printer className="w-4 h-4" />
+          Print Report
+        </button>
       </div>
+      <p className="text-[10px] text-muted-foreground font-body text-center max-w-md mx-auto">
+        Forecasts generated via time-series modelling (Make.com AI connector). All predictions are estimates.
+      </p>
 
       {/* Modal */}
       {showModal && (
