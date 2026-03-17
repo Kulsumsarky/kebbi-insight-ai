@@ -1,7 +1,5 @@
 import { useState, useMemo } from "react";
 import { schoolsData, lgaData, totalSchools } from "@/data/kebbiData";
-import ExportButton from "@/components/ExportButton";
-import { exportToCSV } from "@/lib/csvExport";
 
 const allLGAs = lgaData.map(l => l.name);
 
@@ -31,25 +29,18 @@ const SchoolsTab = () => {
     return "bg-destructive/10 text-destructive";
   };
 
-  const handleExport = () => {
-    exportToCSV("kebbi_schools",
-      ["School Name", "LGA", "Type", "Location", "Students", "Disabled", "Subjects Offered"],
-      filtered.map(s => [s.name, s.lga, s.type, s.location, s.students, s.disabled, s.subjects])
-    );
-  };
-
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-secondary transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+        <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-secondary">
           <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Total Schools</p>
           <p className="text-2xl font-display font-bold text-card-foreground">{totalSchools}</p>
         </div>
-        <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-accent transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+        <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-accent">
           <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Special Needs Only</p>
           <p className="text-2xl font-display font-bold text-card-foreground">{specialNeeds}</p>
         </div>
-        <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-destructive transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+        <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-destructive">
           <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Inclusive</p>
           <p className="text-2xl font-display font-bold text-card-foreground">{inclusive}</p>
         </div>
@@ -83,10 +74,7 @@ const SchoolsTab = () => {
             Reset
           </button>
         </div>
-        <div className="flex items-center justify-between mt-2">
-          <p className="text-xs text-muted-foreground font-body">{filtered.length} record(s) found</p>
-          <ExportButton onClick={handleExport} label="Export Schools" />
-        </div>
+        <p className="text-xs text-muted-foreground mt-2 font-body">{filtered.length} record(s) found</p>
       </div>
 
       <div className="bg-card rounded-md shadow-sm overflow-x-auto">

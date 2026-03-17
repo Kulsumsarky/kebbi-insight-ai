@@ -3,8 +3,6 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import { lgaData, totalTeachers, totalSenTeachers, totalStudents, totalDisabled } from "@/data/kebbiData";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
-import ExportButton from "@/components/ExportButton";
-import { exportToCSV } from "@/lib/csvExport";
 
 const getGapColor = (gap: number) => {
   if (gap <= 25) return "#1a6e2e";
@@ -47,13 +45,6 @@ const OverviewTab = () => {
 
   const gapChartData = lgaData.map(l => ({ name: l.name, gap: l.gapSeverity }));
   const top8 = [...lgaData].sort((a, b) => b.teachers - a.teachers).slice(0, 8).map(l => ({ name: l.name, teachers: l.teachers }));
-
-  const handleExport = () => {
-    exportToCSV("kebbi_lga_overview", 
-      ["LGA", "Schools", "Teachers", "SEN Teachers", "Students", "Ratio (1:x)", "Gap Severity %", "Gap Level"],
-      lgaData.map(l => [l.name, l.schools, l.teachers, l.senTeachers, l.students, `1:${Math.round(l.students / l.teachers)}`, l.gapSeverity, getGapLabel(l.gapSeverity)])
-    );
-  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -103,45 +94,40 @@ const OverviewTab = () => {
           {tableOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         {tableOpen && (
-          <div className="animate-fade-in">
-            <div className="px-4 pb-2">
-              <ExportButton onClick={handleExport} label="Export LGA Data" />
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm font-body">
-                <thead>
-                  <tr className="bg-muted text-left">
-                    <th className="px-4 py-2 font-display font-semibold">LGA</th>
-                    <th className="px-4 py-2 font-display font-semibold">Schools</th>
-                    <th className="px-4 py-2 font-display font-semibold">Teachers</th>
-                    <th className="px-4 py-2 font-display font-semibold">SEN Teachers</th>
-                    <th className="px-4 py-2 font-display font-semibold">Students</th>
-                    <th className="px-4 py-2 font-display font-semibold">Ratio (1:x)</th>
-                    <th className="px-4 py-2 font-display font-semibold">Gap Severity</th>
+          <div className="overflow-x-auto animate-fade-in">
+            <table className="w-full text-sm font-body">
+              <thead>
+                <tr className="bg-muted text-left">
+                  <th className="px-4 py-2 font-display font-semibold">LGA</th>
+                  <th className="px-4 py-2 font-display font-semibold">Schools</th>
+                  <th className="px-4 py-2 font-display font-semibold">Teachers</th>
+                  <th className="px-4 py-2 font-display font-semibold">SEN Teachers</th>
+                  <th className="px-4 py-2 font-display font-semibold">Students</th>
+                  <th className="px-4 py-2 font-display font-semibold">Ratio (1:x)</th>
+                  <th className="px-4 py-2 font-display font-semibold">Gap Severity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lgaData.map((lga, i) => (
+                  <tr key={lga.name} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"}>
+                    <td className="px-4 py-2 font-semibold">{lga.name}</td>
+                    <td className="px-4 py-2">{lga.schools}</td>
+                    <td className="px-4 py-2">{lga.teachers}</td>
+                    <td className="px-4 py-2">{lga.senTeachers}</td>
+                    <td className="px-4 py-2">{lga.students.toLocaleString()}</td>
+                    <td className="px-4 py-2">1:{Math.round(lga.students / lga.teachers)}</td>
+                    <td className="px-4 py-2">
+                      <span
+                        className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
+                        style={{ backgroundColor: getGapColor(lga.gapSeverity) + "20", color: getGapColor(lga.gapSeverity) }}
+                      >
+                        {getGapLabel(lga.gapSeverity)} {lga.gapSeverity}%
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {lgaData.map((lga, i) => (
-                    <tr key={lga.name} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"}>
-                      <td className="px-4 py-2 font-semibold">{lga.name}</td>
-                      <td className="px-4 py-2">{lga.schools}</td>
-                      <td className="px-4 py-2">{lga.teachers}</td>
-                      <td className="px-4 py-2">{lga.senTeachers}</td>
-                      <td className="px-4 py-2">{lga.students.toLocaleString()}</td>
-                      <td className="px-4 py-2">1:{Math.round(lga.students / lga.teachers)}</td>
-                      <td className="px-4 py-2">
-                        <span
-                          className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
-                          style={{ backgroundColor: getGapColor(lga.gapSeverity) + "20", color: getGapColor(lga.gapSeverity) }}
-                        >
-                          {getGapLabel(lga.gapSeverity)} {lga.gapSeverity}%
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

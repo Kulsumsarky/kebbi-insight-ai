@@ -1,7 +1,5 @@
 import { useState, useMemo } from "react";
 import { teachersData, lgaData } from "@/data/kebbiData";
-import ExportButton from "@/components/ExportButton";
-import { exportToCSV } from "@/lib/csvExport";
 
 const allSubjects = [...new Set(teachersData.map(t => t.subject))].sort();
 const allLGAs = lgaData.map(l => l.name);
@@ -26,13 +24,6 @@ const TeachersTab = () => {
   }, [lgaFilter, subjectFilter, trcnFilter, senFilter, search]);
 
   const reset = () => { setLgaFilter(""); setSubjectFilter(""); setTrcnFilter(""); setSenFilter(""); setSearch(""); };
-
-  const handleExport = () => {
-    exportToCSV("kebbi_teachers",
-      ["Name", "LGA", "School", "Subject", "TRCN Status", "SEN Certified", "Experience (yrs)"],
-      filtered.map(t => [t.name, t.lga, t.school, t.subject, t.trcn, t.senCertified ? "Yes" : "No", t.experience])
-    );
-  };
 
   return (
     <div className="space-y-4">
@@ -67,10 +58,7 @@ const TeachersTab = () => {
             Reset
           </button>
         </div>
-        <div className="flex items-center justify-between mt-2">
-          <p className="text-xs text-muted-foreground font-body">{filtered.length} record(s) found</p>
-          <ExportButton onClick={handleExport} label="Export Teachers" />
-        </div>
+        <p className="text-xs text-muted-foreground mt-2 font-body">{filtered.length} record(s) found</p>
       </div>
 
       <div className="bg-card rounded-md shadow-sm overflow-x-auto">
