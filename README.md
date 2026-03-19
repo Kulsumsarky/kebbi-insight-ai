@@ -25,7 +25,7 @@ Key gaps this platform surfaces:
 ---
 
 ## What EduMap Kebbi Does
-An interactive, browser-based education intelligence dashboard with 6 modules:
+It allows stakeholders to have a detailed and informed overview of state of education in the kebbi state. It has an interactive, browser-based education intelligence dashboard with 6 modules:
 
 | Module | What it shows |
 |---|---|
@@ -44,7 +44,7 @@ An interactive, browser-based education intelligence dashboard with 6 modules:
 - IntersectionObserver API — scroll-triggered animations
 - CSS animations — count-up metrics, progress bars, fade-in transitions
 - Make.com AI connector — time-series forecasting layer
-- Hosted on Netlify (no backend required)
+- Hosted on Netlify 
 
 ---
 
@@ -57,15 +57,13 @@ In production, this layer connects to real TRCN and Ministry of Education feeds.
 
 ## Scalability
 - Data layer is fully modular — swap one file to use real government data
-- Architecture is state-agnostic — deployable for any of Nigeria's 36 states
+- Architecture is deployable for any of Nigeria's 36 states
 - AI layer upgradeable from simulated to live ML models as real data becomes available
 
 ---
 
 ## Project Info
 - **Competition:** 3MTT Knowledge Showcase Special Edition 2026
-- **Organiser:** TNTG Nigeria
-- **Pillar:** Education — Pillar 2 of FEED Framework
+- **Organiser:** 3MTT Nigeria
 - **Track:** AI and Machine Learning
-- **Submission deadline:** March 24, 2026
-- **Individual submission** by Kulsum
+- **Individual submission** by UmmulKulsum Attahiru
