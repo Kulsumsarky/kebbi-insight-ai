@@ -7,7 +7,7 @@
 ---
 
 ## Live Demo
-**https://69bb12de4accc7c33e90c0c2--edu-insights-kebbi.netlify.app/**
+**https://kebbi-insight-ai.lovable.app/**
 
 ---
 
