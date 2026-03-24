@@ -16,16 +16,17 @@ Kebbi State's Ministry of Education has no centralised view of teacher distribut
 SEN (Special Educational Needs) coverage, or 2025 curriculum reform readiness
 across its 21 Local Government Areas.
 
-Key gaps this platform surfaces:
-- 4,823 licensed teachers for 287,440 students — but distribution is deeply unequal
-- Only 312 SEN-certified teachers support 14,372 students with disabilities (ratio 1:46 — nearly double the recommended max of 1:25)
-- 8 of 21 LGAs have zero qualified teachers for any of the 6 new mandatory 2025 trade subjects
-- LGAs like Suru (82% gap) and Shanga (78% gap) are in critical shortage
+The data used in the app is simulated to show the how the app unifies data, identifies gaps, provides insight and possible solutions based on the data provided.
 
 ---
 
 ## What EduMap Kebbi Does
-It allows stakeholders to have a detailed and informed overview of state of education in the kebbi state. It has an interactive, browser-based education intelligence dashboard with 6 modules:
+It allows stakeholders to have a detailed and informed overview of state of education in the kebbi state. These stakeholders are
+-State Ministry of Education officials — who need state‑wide visibility to set recruitment priorities, budget allocations, and reform rollout plans
+-LGA Education Secretaries — who require LGA‑specific dashboards to track teacher deployment and school readiness within their jurisdiction
+-School Administrators — who can view their school’s data, understand curriculum compliance gaps, and flag resource needs to supervisors
+ 
+ It has an interactive, browser-based education intelligence dashboard with 6 modules:
 
 | Module | What it shows |
 |---|---|
@@ -56,9 +57,7 @@ In production, this layer connects to real TRCN and Ministry of Education feeds.
 ---
 
 ## Scalability
-- Data layer is fully modular — swap one file to use real government data
-- Architecture is deployable for any of Nigeria's 36 states
-- AI layer upgradeable from simulated to live ML models as real data becomes available
+EduMap Kebbi is built to scale in three directions. First, the data layer is fully modular — replacing mock data with real API feeds or government exports requires only a single file swap. Second, the architecture is state‑agnostic; the same codebase can be redeployed for any of Nigeria’s 36 states plus FCT by updating the LGA dataset and branding, creating a potential national Education Intelligence Network. Third, the AI prediction layer can be upgraded from simulated forecasts to live machine learning models as real historical data becomes available, enabling increasingly accurate staffing projections over time.
 
 ---
 
