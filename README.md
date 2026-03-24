@@ -55,7 +55,7 @@ Empowers education leaders at state, LGA, and school levels with a common intell
 - IntersectionObserver API — scroll-triggered animations
 - CSS animations — count-up metrics, progress bars, fade-in transitions
 - Make.com AI connector — time-series forecasting layer
-- Hosted on Netlify 
+- Published on Lovable
 
 ---
 
