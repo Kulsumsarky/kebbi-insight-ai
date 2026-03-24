@@ -21,10 +21,11 @@ The data used in the app is simulated to show the how the app unifies data, iden
 ---
 
 ## What EduMap Kebbi Does
-It allows stakeholders to have a detailed and informed overview of state of education in the kebbi state. These stakeholders are:
--State Ministry of Education officials who need state‑wide visibility to set recruitment priorities, budget allocations, and reform rollout plans
--LGA Education Secretaries who require LGA‑specific dashboards to track teacher deployment and school readiness within their jurisdiction
--School Administrators who can view their school’s data, understand curriculum compliance gaps, and flag resource needs to supervisors
+It allows stakeholders to have a detailed and informed overview of state of education in the kebbi state. 
+These stakeholders are:
+1. State Ministry of Education officials who need state‑wide visibility to set recruitment priorities, budget allocations, and reform rollout plans
+2. LGA Education Secretaries who require LGA‑specific dashboards to track teacher deployment and school readiness within their jurisdiction
+3. School Administrators who can view their school’s data, understand curriculum compliance gaps, and flag resource needs to supervisors
  
  It has an interactive, browser-based education intelligence dashboard with 6 modules:
 
