@@ -1,7 +1,12 @@
+import { LogOut } from "lucide-react";
 import kebbiSeal from "@/assets/kebbi-seal.jpg";
 import kebbiMap from "@/assets/kebbi-map.jpg";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 const Header = () => {
+  const { user, signOut } = useAuth();
+
   return (
     <header className="bg-primary border-b-[3px] border-accent">
       <div className="container flex items-center justify-between py-3">
@@ -18,6 +23,18 @@ const Header = () => {
             <span className="text-[10px] border border-accent text-accent rounded-full px-2 py-0.5 font-display font-semibold">3MTT NextGen 2026</span>
             <span className="text-[10px] border border-accent text-accent rounded-full px-2 py-0.5 font-display font-semibold">Powered by AI</span>
           </div>
+          {user && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={signOut}
+              className="text-accent hover:text-primary-foreground hover:bg-secondary"
+              aria-label="Sign out"
+            >
+              <LogOut className="w-4 h-4 md:mr-1.5" />
+              <span className="hidden md:inline">Sign out</span>
+            </Button>
+          )}
         </div>
       </div>
     </header>
