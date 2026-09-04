@@ -1,24 +1,24 @@
-import { useState } from "react";
-
-const roles = ["State Ministry of Education", "LGA Education Secretary", "School Administrator"];
+import { useAuth, roleLabels } from "@/hooks/useAuth";
 
 const RoleSelector = () => {
-  const [role, setRole] = useState(roles[0]);
+  const { role, profile } = useAuth();
 
   return (
     <div className="bg-kebbi-light border-b border-border">
       <div className="container flex items-center justify-between py-2 flex-wrap gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-display font-semibold text-foreground">Viewing as:</span>
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="text-sm border border-border rounded-md px-3 py-1.5 bg-card text-foreground font-body focus:ring-2 focus:ring-accent focus:outline-none"
-          >
-            {roles.map(r => <option key={r} value={r}>{r}</option>)}
-          </select>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm font-display font-semibold text-foreground">Signed in as:</span>
+          <span className="text-sm border border-secondary text-secondary rounded-full px-3 py-1 font-display font-semibold bg-card">
+            {role ? roleLabels[role] : "Access level pending assignment"}
+          </span>
+          {profile?.full_name && (
+            <span className="text-xs text-muted-foreground font-body">{profile.full_name}</span>
+          )}
+          {profile?.lga && (
+            <span className="text-xs text-muted-foreground font-body">LGA: {profile.lga}</span>
+          )}
         </div>
-        <span className="text-xs text-muted-foreground font-body">Last updated: March 2026 (Mock Data)</span>
+        <span className="text-xs text-muted-foreground font-body">Last updated: March 2026 (Simulated Data)</span>
       </div>
     </div>
   );
