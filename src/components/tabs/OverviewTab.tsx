@@ -1,24 +1,47 @@
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { lgaData, totalTeachers, totalSenTeachers, totalStudents, totalDisabled } from "@/data/kebbiData";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import {
+  lgaData,
+  statewide,
+  enrolmentTotal,
+  reportedSchools,
+  lgasWithSchoolData,
+  reportedTeachers,
+  lgasWithTeacherData,
+  pupilTeacherRatio,
+  DATA_SOURCE,
+  PARTIAL_DATA_NOTE,
+  DNEMIS_NOTE,
+} from "@/data/kebbiData";
+import { ChevronDown, ChevronUp, Info, Scale } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
+import PendingBadge from "@/components/PendingBadge";
 
 const getGapColor = (gap: number) => {
-  if (gap <= 25) return "#1a6e2e";
-  if (gap <= 40) return "#c9a227";
-  if (gap <= 55) return "#e67e22";
-  return "#d63031";
+  if (gap >= 400) return "#d63031";
+  if (gap >= 200) return "#e67e22";
+  if (gap >= 50) return "#c9a227";
+  return "#1a6e2e";
 };
 
 const getGapLabel = (gap: number) => {
-  if (gap <= 25) return "Low";
-  if (gap <= 40) return "Moderate";
-  if (gap <= 55) return "High";
-  return "Critical";
+  if (gap >= 400) return "Critical";
+  if (gap >= 200) return "High";
+  if (gap >= 50) return "Moderate";
+  return "Low";
 };
 
-const MetricCard = ({ title, value, border, extra }: { title: string; value: number; border: string; extra?: React.ReactNode }) => {
+const MetricCard = ({
+  title,
+  value,
+  border,
+  extra,
+}: {
+  title: string;
+  value: number;
+  border: string;
+  extra?: React.ReactNode;
+}) => {
   const { count, ref } = useCountUp(value);
   return (
     <div
@@ -33,36 +56,93 @@ const MetricCard = ({ title, value, border, extra }: { title: string; value: num
   );
 };
 
-const ProgressBar = ({ pct, color }: { pct: number; color: string }) => (
-  <div className="w-full h-2 bg-muted rounded-full mt-2">
-    <div className="h-2 rounded-full transition-all duration-1000" style={{ width: `${pct}%`, backgroundColor: color }} />
-  </div>
-);
-
 const OverviewTab = () => {
   const [tableOpen, setTableOpen] = useState(false);
-  const senRatio = Math.round(totalDisabled / totalSenTeachers);
+  const [dnemisOpen, setDnemisOpen] = useState(false);
 
-  const gapChartData = lgaData.map(l => ({ name: l.name, gap: l.gapSeverity }));
-  const top8 = [...lgaData].sort((a, b) => b.teachers - a.teachers).slice(0, 8).map(l => ({ name: l.name, teachers: l.teachers }));
+  const senRatio = Math.round(statewide.senLearners / statewide.senTeachers);
+  const stateRatio = Math.round(statewide.students / statewide.teachers);
+
+  const gapChartData = [...lgaData]
+    .sort((a, b) => b.teacherGap2024 - a.teacherGap2024)
+    .map(l => ({ name: l.name, gap: l.teacherGap2024 }));
+
+  const top8 = [...lgaData]
+    .sort((a, b) => b.students - a.students)
+    .slice(0, 8)
+    .map(l => ({ name: l.name, learners: l.students }));
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard title="Licensed Teachers" value={totalTeachers} border="#1a6e2e" extra={<ProgressBar pct={79} color="#1a6e2e" />} />
-        <MetricCard title="SEN-Certified Teachers" value={totalSenTeachers} border="#c9a227" extra={<ProgressBar pct={25} color="#c9a227" />} />
-        <MetricCard title="Total Students" value={totalStudents} border="#1a6e2e" extra={<ProgressBar pct={68} color="#1a6e2e" />} />
-        <MetricCard title="Students with Disabilities" value={totalDisabled} border="#d63031" extra={<p className="text-xs mt-2 text-muted-foreground">Current ratio {senRatio}:1</p>} />
+        <MetricCard
+          title="Teachers Statewide"
+          value={statewide.teachers}
+          border="#1a6e2e"
+          extra={
+            <p className="text-xs mt-2 text-muted-foreground font-body">
+              LGA records complete for {lgasWithTeacherData} of {lgaData.length} LGAs ({reportedTeachers.toLocaleString()} attributed)
+            </p>
+          }
+        />
+        <MetricCard
+          title="Learners Enrolled"
+          value={statewide.students}
+          border="#0f4a1e"
+          extra={
+            <p className="text-xs mt-2 text-muted-foreground font-body">
+              Pre-primary/primary + JSS, 2022–2023 · ratio 1:{stateRatio}
+            </p>
+          }
+        />
+        <MetricCard
+          title="Teacher Gap (2024 Baseline)"
+          value={statewide.teacherGap2024}
+          border="#d63031"
+          extra={<p className="text-xs mt-2 text-muted-foreground font-body">Shortfall against subject staffing norms</p>}
+        />
+        <MetricCard
+          title="Special Needs Learners"
+          value={statewide.senLearners}
+          border="#c9a227"
+          extra={
+            <p className="text-xs mt-2 text-muted-foreground font-body">
+              {statewide.senTeachers} specialist staff · ratio 1:{senRatio}
+            </p>
+          }
+        />
+      </div>
+
+      {/* DNEMIS reconciliation note */}
+      <div className="bg-card rounded-md shadow-sm border-l-4 border-l-accent">
+        <button
+          onClick={() => setDnemisOpen(!dnemisOpen)}
+          className="w-full flex items-center justify-between gap-2 p-4 text-left hover:bg-muted/50 transition-colors"
+        >
+          <span className="flex items-center gap-2 font-display font-semibold text-sm text-card-foreground">
+            <Scale className="w-4 h-4 text-accent" />
+            Why these figures may differ from DNEMIS
+          </span>
+          {dnemisOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+        {dnemisOpen && (
+          <div className="px-4 pb-4 animate-fade-in space-y-2">
+            <p className="text-sm font-body text-muted-foreground">{DNEMIS_NOTE}</p>
+            <p className="text-xs font-body text-muted-foreground">{DATA_SOURCE}</p>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-card rounded-md p-4 shadow-sm transition-shadow duration-200 hover:shadow-lg">
-          <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Gap Severity by LGA (%)</h3>
+          <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">
+            Teacher Gap by LGA — 2024 Baseline
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={gapChartData} margin={{ left: 0, right: 0 }}>
               <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" height={80} />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip />
+              <Tooltip formatter={(v: number) => [`${v} teachers`, "Gap"]} />
               <Bar dataKey="gap" radius={[2, 2, 0, 0]}>
                 {gapChartData.map((entry, i) => (
                   <Cell key={i} fill={getGapColor(entry.gap)} />
@@ -73,13 +153,13 @@ const OverviewTab = () => {
         </div>
 
         <div className="bg-card rounded-md p-4 shadow-sm transition-shadow duration-200 hover:shadow-lg">
-          <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Top 8 LGAs by Teacher Count</h3>
+          <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Top 8 LGAs by Learner Enrolment</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={top8} layout="vertical" margin={{ left: 60 }}>
               <XAxis type="number" tick={{ fontSize: 10 }} />
               <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={80} />
-              <Tooltip />
-              <Bar dataKey="teachers" fill="#1a6e2e" radius={[0, 2, 2, 0]} />
+              <Tooltip formatter={(v: number) => v.toLocaleString()} />
+              <Bar dataKey="learners" fill="#1a6e2e" radius={[0, 2, 2, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -90,7 +170,7 @@ const OverviewTab = () => {
           onClick={() => setTableOpen(!tableOpen)}
           className="w-full flex items-center justify-between p-4 font-display font-semibold text-sm text-card-foreground hover:bg-muted/50 transition-colors"
         >
-          <span>All 21 LGAs — Full Data Table</span>
+          <span>All {lgaData.length} LGAs — Full Data Table</span>
           {tableOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         {tableOpen && (
@@ -101,33 +181,48 @@ const OverviewTab = () => {
                   <th className="px-4 py-2 font-display font-semibold">LGA</th>
                   <th className="px-4 py-2 font-display font-semibold">Schools</th>
                   <th className="px-4 py-2 font-display font-semibold">Teachers</th>
-                  <th className="px-4 py-2 font-display font-semibold">SEN Teachers</th>
-                  <th className="px-4 py-2 font-display font-semibold">Students</th>
+                  <th className="px-4 py-2 font-display font-semibold">Learners</th>
                   <th className="px-4 py-2 font-display font-semibold">Ratio (1:x)</th>
-                  <th className="px-4 py-2 font-display font-semibold">Gap Severity</th>
+                  <th className="px-4 py-2 font-display font-semibold">Teacher Gap 2024</th>
                 </tr>
               </thead>
               <tbody>
-                {lgaData.map((lga, i) => (
-                  <tr key={lga.name} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"}>
-                    <td className="px-4 py-2 font-semibold">{lga.name}</td>
-                    <td className="px-4 py-2">{lga.schools}</td>
-                    <td className="px-4 py-2">{lga.teachers}</td>
-                    <td className="px-4 py-2">{lga.senTeachers}</td>
-                    <td className="px-4 py-2">{lga.students.toLocaleString()}</td>
-                    <td className="px-4 py-2">1:{Math.round(lga.students / lga.teachers)}</td>
-                    <td className="px-4 py-2">
-                      <span
-                        className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
-                        style={{ backgroundColor: getGapColor(lga.gapSeverity) + "20", color: getGapColor(lga.gapSeverity) }}
-                      >
-                        {getGapLabel(lga.gapSeverity)} {lga.gapSeverity}%
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {lgaData.map((lga, i) => {
+                  const ratio = pupilTeacherRatio(lga);
+                  return (
+                    <tr key={lga.name} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"}>
+                      <td className="px-4 py-2 font-semibold">{lga.name}</td>
+                      <td className="px-4 py-2">
+                        {lga.totalSchools !== null ? lga.totalSchools.toLocaleString() : <PendingBadge />}
+                      </td>
+                      <td className="px-4 py-2">
+                        {lga.teachers !== null ? lga.teachers.toLocaleString() : <PendingBadge />}
+                      </td>
+                      <td className="px-4 py-2">{lga.students.toLocaleString()}</td>
+                      <td className="px-4 py-2">{ratio !== null ? `1:${ratio}` : <PendingBadge />}</td>
+                      <td className="px-4 py-2">
+                        <span
+                          className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full"
+                          style={{
+                            backgroundColor: getGapColor(lga.teacherGap2024) + "20",
+                            color: getGapColor(lga.teacherGap2024),
+                          }}
+                        >
+                          {getGapLabel(lga.teacherGap2024)} · {lga.teacherGap2024}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
+            <p className="text-xs text-muted-foreground font-body p-4 pt-3 flex items-start gap-2">
+              <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+              <span>
+                Schools reported for {lgasWithSchoolData} of {lgaData.length} LGAs ({reportedSchools.toLocaleString()} schools);
+                enrolment complete for all {lgaData.length} LGAs ({enrolmentTotal.toLocaleString()} learners). {PARTIAL_DATA_NOTE}
+              </span>
+            </p>
           </div>
         )}
       </div>
