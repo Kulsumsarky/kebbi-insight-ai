@@ -2,7 +2,14 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const tabs = ["Overview", "Teacher Density", "Teachers", "Schools", "Academic Health", "AI Predictions"];
+export const tabs = [
+  "AI Predictions",
+  "Academic Health",
+  "Overview",
+  "Teacher Density",
+  "Teachers",
+  "Schools",
+];
 
 interface TabNavProps {
   activeTab: number;
