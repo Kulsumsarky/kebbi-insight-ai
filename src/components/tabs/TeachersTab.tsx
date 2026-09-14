@@ -59,6 +59,10 @@ const TeachersTab = () => {
           </button>
         </div>
         <p className="text-xs text-muted-foreground mt-2 font-body">{filtered.length} record(s) found</p>
+        <p className="text-xs text-muted-foreground mt-1 font-body">
+          The March 2025 baseline report publishes workforce totals, not named teacher records. The rows below are
+          illustrative and demonstrate the registry; they will be replaced by authorised KbSUBEB/TRCN records.
+        </p>
       </div>
 
       <div className="bg-card rounded-md shadow-sm overflow-x-auto">
