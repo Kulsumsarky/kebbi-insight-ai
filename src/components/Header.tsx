@@ -20,7 +20,6 @@ const Header = () => {
         <div className="flex items-center gap-3">
           <img src={kebbiMap} alt="Kebbi State Map" className="w-[52px] h-[52px] rounded-md border-2 border-accent object-cover" />
           <div className="hidden md:flex flex-col gap-1">
-            <span className="text-[10px] border border-accent text-accent rounded-full px-2 py-0.5 font-display font-semibold">3MTT NextGen 2026</span>
             <span className="text-[10px] border border-accent text-accent rounded-full px-2 py-0.5 font-display font-semibold">Powered by AI</span>
           </div>
           {user && (

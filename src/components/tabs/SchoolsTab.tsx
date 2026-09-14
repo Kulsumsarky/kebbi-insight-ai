@@ -1,5 +1,8 @@
 import { useState, useMemo } from "react";
-import { schoolsData, lgaData, totalSchools } from "@/data/kebbiData";
+import { Info } from "lucide-react";
+import {
+  schoolsData, lgaData, reportedSchools, lgasWithSchoolData, statewide, PARTIAL_DATA_NOTE,
+} from "@/data/kebbiData";
 
 const allLGAs = lgaData.map(l => l.name);
 
@@ -30,21 +33,38 @@ const SchoolsTab = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-in">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-secondary">
-          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Total Schools</p>
-          <p className="text-2xl font-display font-bold text-card-foreground">{totalSchools}</p>
+          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Schools Reported</p>
+          <p className="text-2xl font-display font-bold text-card-foreground">{reportedSchools.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground font-body mt-1">
+            {lgasWithSchoolData} of {lgaData.length} LGAs — remainder data pending
+          </p>
         </div>
         <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-accent">
-          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Special Needs Only</p>
-          <p className="text-2xl font-display font-bold text-card-foreground">{specialNeeds}</p>
+          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Special Needs Schools</p>
+          <p className="text-2xl font-display font-bold text-card-foreground">{statewide.senSchools}</p>
+          <p className="text-xs text-muted-foreground font-body mt-1">
+            {statewide.senLearners.toLocaleString()} learners statewide
+          </p>
         </div>
         <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-destructive">
-          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Inclusive</p>
-          <p className="text-2xl font-display font-bold text-card-foreground">{inclusive}</p>
+          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Learners Enrolled</p>
+          <p className="text-2xl font-display font-bold text-card-foreground">{statewide.students.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground font-body mt-1">All {lgaData.length} LGAs reporting</p>
         </div>
       </div>
+
+      <p className="text-xs text-muted-foreground font-body flex items-start gap-2">
+        <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+        <span>
+          {PARTIAL_DATA_NOTE} The directory below shows illustrative school records used to demonstrate search and filtering;
+          it will be replaced by authorised KbSUBEB school-level records. Special needs counts: {specialNeeds} in the sample,
+          {" "}{inclusive} inclusive.
+        </span>
+      </p>
+
 
       <div className="bg-card rounded-md p-4 shadow-sm">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
