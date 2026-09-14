@@ -1,4 +1,7 @@
+import { Info } from "lucide-react";
 import { useAuth, roleLabels } from "@/hooks/useAuth";
+import { DATA_SOURCE, PARTIAL_DATA_NOTE } from "@/data/kebbiData";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const RoleSelector = () => {
   const { role, profile } = useAuth();
@@ -18,7 +21,15 @@ const RoleSelector = () => {
             <span className="text-xs text-muted-foreground font-body">LGA: {profile.lga}</span>
           )}
         </div>
-        <span className="text-xs text-muted-foreground font-body">Last updated: March 2026 (Simulated Data)</span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="text-xs text-muted-foreground font-body flex items-center gap-1 cursor-help max-w-xl text-right">
+              <Info className="w-3.5 h-3.5 flex-shrink-0" />
+              {DATA_SOURCE}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">{PARTIAL_DATA_NOTE}</TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );
