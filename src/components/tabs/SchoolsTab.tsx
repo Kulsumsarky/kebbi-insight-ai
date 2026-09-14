@@ -1,5 +1,8 @@
 import { useState, useMemo } from "react";
-import { schoolsData, lgaData, totalSchools } from "@/data/kebbiData";
+import { Info } from "lucide-react";
+import {
+  schoolsData, lgaData, reportedSchools, lgasWithSchoolData, statewide, PARTIAL_DATA_NOTE,
+} from "@/data/kebbiData";
 
 const allLGAs = lgaData.map(l => l.name);
 

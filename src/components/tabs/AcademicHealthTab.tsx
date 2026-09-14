@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from "recharts";
-import { lgaData, curriculumData, subjects, getReadiness, performanceData } from "@/data/kebbiData";
+import {
+  lgaData, curriculumData, subjects, getReadiness, subjectNeedTotals, subjectNeeds, subjectNeedYears,
+} from "@/data/kebbiData";
+import { Info } from "lucide-react";
 
 const getCellColor = (val: string) => {
   if (val === "Yes") return "bg-secondary/20 text-secondary font-semibold";
@@ -8,39 +11,39 @@ const getCellColor = (val: string) => {
   return "bg-destructive/10 text-destructive font-semibold";
 };
 
+const topSubjects = subjectNeedTotals.slice(0, 4).map(s => s.subject);
+const lineColours = ["#0f4a1e", "#1a6e2e", "#c9a227", "#d63031"];
+
 const AcademicHealthTab = () => {
-  const [subTab, setSubTab] = useState<"curriculum" | "performance">("curriculum");
+  const [subTab, setSubTab] = useState<"curriculum" | "subjects">("curriculum");
 
   const readinessData = lgaData.map(l => ({ name: l.name, readiness: getReadiness(l.name) }));
 
-  const passRateData = performanceData.years.map((y, i) => ({
-    year: y,
-    ...Object.fromEntries(Object.entries(performanceData.lgaPass).map(([lga, vals]) => [lga, vals[i]])),
-  }));
-
-  const subjectData = performanceData.years.map((y, i) => ({
-    year: y,
-    ...Object.fromEntries(Object.entries(performanceData.subjectTrend).map(([sub, vals]) => [sub, vals[i]])),
+  const subjectTrend = subjectNeedYears.map(year => ({
+    year,
+    ...Object.fromEntries(
+      topSubjects.map(s => [s, subjectNeeds.find(n => n.subject === s && n.year === year)?.additionalTeachersNeeded ?? 0]),
+    ),
   }));
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2">
+    <div className="space-y-4 animate-fade-in">
+      <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setSubTab("curriculum")}
           className={`px-4 py-2 text-sm font-display font-semibold rounded-md transition-colors ${
             subTab === "curriculum" ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
           }`}
         >
-          Curriculum Coverage
+          Vocational &amp; Curriculum Readiness
         </button>
         <button
-          onClick={() => setSubTab("performance")}
+          onClick={() => setSubTab("subjects")}
           className={`px-4 py-2 text-sm font-display font-semibold rounded-md transition-colors ${
-            subTab === "performance" ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+            subTab === "subjects" ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
           }`}
         >
-          Student Performance
+          Subject Teacher Needs
         </button>
       </div>
 
@@ -74,81 +77,71 @@ const AcademicHealthTab = () => {
           </div>
 
           <div className="bg-card rounded-md p-4 shadow-sm">
-            <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Curriculum Readiness by LGA</h3>
+            <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Vocational Readiness by LGA</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={readinessData} margin={{ left: 0 }}>
                 <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" height={80} />
                 <YAxis tick={{ fontSize: 10 }} domain={[0, 100]} />
-                <Tooltip />
+                <Tooltip formatter={(v: number) => [`${v}%`, "Readiness"]} />
                 <Bar dataKey="readiness" fill="#1a6e2e" radius={[2, 2, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+            <p className="text-xs text-muted-foreground font-body mt-2 flex items-start gap-2">
+              <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+              <span>
+                Trade-subject coverage is an indicative EduMap assessment for the 2025 curriculum rollout, not a KbSUBEB
+                published figure. It will be replaced by verified school-level returns.
+              </span>
+            </p>
           </div>
         </div>
       )}
 
-      {subTab === "performance" && (
+      {subTab === "subjects" && (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="bg-card rounded-md p-4 shadow-sm">
-              <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">WAEC/NECO Pass Rates — Top 4 LGAs</h3>
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={passRateData}>
-                  <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} domain={[40, 80]} />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="Birnin Kebbi" stroke="#0f4a1e" strokeWidth={2} />
-                  <Line type="monotone" dataKey="Argungu" stroke="#1a6e2e" strokeWidth={2} />
-                  <Line type="monotone" dataKey="Yauri" stroke="#c9a227" strokeWidth={2} />
-                  <Line type="monotone" dataKey="Gwandu" stroke="#e67e22" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="bg-card rounded-md p-4 shadow-sm">
-              <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Subject Trend 2022–2024</h3>
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={subjectData}>
-                  <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} domain={[20, 70]} />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="Mathematics" stroke="#0f4a1e" strokeWidth={2} />
-                  <Line type="monotone" dataKey="English" stroke="#1a6e2e" strokeWidth={2} />
-                  <Line type="monotone" dataKey="Science" stroke="#c9a227" strokeWidth={2} />
-                  <Line type="monotone" dataKey="Vocational" stroke="#d63031" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
           <div className="bg-card rounded-md shadow-sm overflow-x-auto">
-            <h3 className="font-display font-semibold text-sm p-4 pb-2 text-card-foreground">Declining LGAs — Action Needed</h3>
+            <h3 className="font-display font-semibold text-sm p-4 pb-2 text-card-foreground">
+              Additional Teachers Needed by Subject (2025–2029)
+            </h3>
             <table className="w-full text-sm font-body">
               <thead>
                 <tr className="bg-muted text-left">
-                  <th className="px-4 py-2 font-display font-semibold">LGA</th>
-                  <th className="px-4 py-2 font-display font-semibold">2022%</th>
-                  <th className="px-4 py-2 font-display font-semibold">2023%</th>
-                  <th className="px-4 py-2 font-display font-semibold">2024%</th>
-                  <th className="px-4 py-2 font-display font-semibold">Change</th>
-                  <th className="px-4 py-2 font-display font-semibold">Action Needed</th>
+                  <th className="px-4 py-2 font-display font-semibold">Subject</th>
+                  {subjectNeedYears.map(y => <th key={y} className="px-4 py-2 font-display font-semibold text-center">{y}</th>)}
+                  <th className="px-4 py-2 font-display font-semibold text-center">5-year total</th>
                 </tr>
               </thead>
               <tbody>
-                {performanceData.decliningLGAs.map((d, i) => (
-                  <tr key={d.lga} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"}>
-                    <td className="px-4 py-2 font-semibold">{d.lga}</td>
-                    <td className="px-4 py-2">{d.y2022}%</td>
-                    <td className="px-4 py-2">{d.y2023}%</td>
-                    <td className="px-4 py-2">{d.y2024}%</td>
-                    <td className="px-4 py-2 text-destructive font-semibold">{d.change}%</td>
-                    <td className="px-4 py-2">{d.action}</td>
+                {subjectNeedTotals.map((s, i) => (
+                  <tr key={s.subject} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"}>
+                    <td className="px-4 py-2 font-semibold">{s.subject}</td>
+                    {subjectNeedYears.map(y => (
+                      <td key={y} className="px-4 py-2 text-center">
+                        {subjectNeeds.find(n => n.subject === s.subject && n.year === y)?.additionalTeachersNeeded ?? 0}
+                      </td>
+                    ))}
+                    <td className="px-4 py-2 text-center font-display font-bold">{s.total}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="bg-card rounded-md p-4 shadow-sm">
+            <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">
+              Highest-Demand Subjects, 2025–2029
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={subjectTrend}>
+                <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Legend />
+                {topSubjects.map((s, i) => (
+                  <Line key={s} type="monotone" dataKey={s} stroke={lineColours[i]} strokeWidth={2} />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       )}
