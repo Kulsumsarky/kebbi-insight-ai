@@ -3,8 +3,6 @@ import { DATA_SOURCE, PARTIAL_DATA_NOTE } from "@/data/kebbiData";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const RoleSelector = () => {
-  const { role, profile } = useAuth();
-
   return (
     <div className="bg-kebbi-light border-b border-border">
       <div className="container flex items-center justify-end py-2 flex-wrap gap-2">
