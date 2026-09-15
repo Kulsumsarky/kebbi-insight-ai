@@ -1,5 +1,4 @@
 import { Info } from "lucide-react";
-import { useAuth, roleLabels } from "@/hooks/useAuth";
 import { DATA_SOURCE, PARTIAL_DATA_NOTE } from "@/data/kebbiData";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
