@@ -32,6 +32,27 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (mode === "forgot") {
+      const emailCheck = z.string().trim().email("Enter a valid email address").max(255).safeParse(email);
+      if (!emailCheck.success) {
+        toast.error(emailCheck.error.issues[0].message);
+        return;
+      }
+      setBusy(true);
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(emailCheck.data, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("Password reset link sent — check your email inbox.");
+        setMode("login");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Could not send reset link");
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     const parsed = schema.safeParse({ email, password, fullName });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
@@ -96,12 +117,14 @@ const Auth = () => {
 
         <div className="bg-card border border-border rounded-xl p-6 shadow-lg">
           <h2 className="font-display font-bold text-lg text-foreground mb-1">
-            {mode === "login" ? "Official sign in" : "Request an account"}
+            {mode === "login" ? "Official sign in" : mode === "signup" ? "Request an account" : "Reset your password"}
           </h2>
           <p className="text-sm text-muted-foreground mb-5 font-body">
             {mode === "login"
               ? "Authorised Ministry, LGA and school officials only."
-              : "Create your account — access level is assigned by the Ministry."}
+              : mode === "signup"
+                ? "Create your account — access level is assigned by the Ministry."
+                : "Enter your official email and we'll send you a secure reset link."}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
