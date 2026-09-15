@@ -20,7 +20,7 @@ const schema = z.object({
 const Auth = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -32,6 +32,27 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (mode === "forgot") {
+      const emailCheck = z.string().trim().email("Enter a valid email address").max(255).safeParse(email);
+      if (!emailCheck.success) {
+        toast.error(emailCheck.error.issues[0].message);
+        return;
+      }
+      setBusy(true);
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(emailCheck.data, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("Password reset link sent — check your email inbox.");
+        setMode("login");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Could not send reset link");
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
     const parsed = schema.safeParse({ email, password, fullName });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
@@ -96,12 +117,14 @@ const Auth = () => {
 
         <div className="bg-card border border-border rounded-xl p-6 shadow-lg">
           <h2 className="font-display font-bold text-lg text-foreground mb-1">
-            {mode === "login" ? "Official sign in" : "Request an account"}
+            {mode === "login" ? "Official sign in" : mode === "signup" ? "Request an account" : "Reset your password"}
           </h2>
           <p className="text-sm text-muted-foreground mb-5 font-body">
             {mode === "login"
               ? "Authorised Ministry, LGA and school officials only."
-              : "Create your account — access level is assigned by the Ministry."}
+              : mode === "signup"
+                ? "Create your account — access level is assigned by the Ministry."
+                : "Enter your official email and we'll send you a secure reset link."}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -129,34 +152,51 @@ const Auth = () => {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 8 characters"
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
-                required
-              />
-            </div>
+            {mode !== "forgot" && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  {mode === "login" && (
+                    <button
+                      type="button"
+                      onClick={() => setMode("forgot")}
+                      className="text-xs text-secondary hover:underline font-body"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 8 characters"
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  required
+                />
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={busy}>
               {busy && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {mode === "login" ? "Sign in" : "Create account"}
+              {mode === "login" ? "Sign in" : mode === "signup" ? "Create account" : "Send reset link"}
             </Button>
           </form>
 
-          <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-card px-2 text-muted-foreground font-body">or</span>
-            </div>
-          </div>
+          {mode !== "forgot" && (
+            <>
+              <div className="relative my-5">
+                <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-card px-2 text-muted-foreground font-body">or</span>
+                </div>
+              </div>
 
-          <Button variant="outline" className="w-full" onClick={handleGoogle} disabled={busy}>
-            Continue with Google
-          </Button>
+              <Button variant="outline" className="w-full" onClick={handleGoogle} disabled={busy}>
+                Continue with Google
+              </Button>
+            </>
+          )}
 
           <button
             type="button"
