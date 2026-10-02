@@ -3,15 +3,14 @@ import Header from "@/components/Header";
 import RoleSelector from "@/components/RoleSelector";
 import TabNav from "@/components/TabNav";
 import OverviewTab from "@/components/tabs/OverviewTab";
-import TeacherDensityTab from "@/components/tabs/TeacherDensityTab";
-import TeachersTab from "@/components/tabs/TeachersTab";
+import TeacherGapsTab from "@/components/tabs/TeacherGapsTab";
+import DeploymentTab from "@/components/tabs/DeploymentTab";
 import SchoolsTab from "@/components/tabs/SchoolsTab";
-import AcademicHealthTab from "@/components/tabs/AcademicHealthTab";
 import AIPredictionsTab from "@/components/tabs/AIPredictionsTab";
 import { DATA_SOURCE, PARTIAL_DATA_NOTE } from "@/data/kebbiData";
 
 // Order must match the tab labels in TabNav.
-const tabComponents = [AIPredictionsTab, AcademicHealthTab, OverviewTab, TeacherDensityTab, TeachersTab, SchoolsTab];
+const tabComponents = [OverviewTab, TeacherGapsTab, DeploymentTab, SchoolsTab, AIPredictionsTab];
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState(0);

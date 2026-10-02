@@ -7,7 +7,7 @@ import PendingBadge from "@/components/PendingBadge";
 const urgencyClass = {
   Low: "bg-secondary/15 text-secondary",
   Moderate: "bg-accent/20 text-accent",
-  High: "bg-orange-100 text-orange-700",
+  High: "bg-warning/15 text-warning",
   Critical: "bg-destructive/10 text-destructive",
 };
 
