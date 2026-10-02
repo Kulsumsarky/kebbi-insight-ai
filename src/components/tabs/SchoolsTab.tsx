@@ -1,10 +1,23 @@
-import { useState, useMemo } from "react";
-import { Info } from "lucide-react";
-import {
-  schoolsData, lgaData, reportedSchools, lgasWithSchoolData, statewide, PARTIAL_DATA_NOTE,
-} from "@/data/kebbiData";
+import { useMemo, useState } from "react";
+import { Check, Info, Minus, X } from "lucide-react";
+import { coreCoverageForSchool, lgaData, reportedSchools, schoolsData, type CoreCoverageStatus } from "@/data/kebbiData";
+import { Button } from "@/components/ui/button";
 
-const allLGAs = lgaData.map(l => l.name);
+const allLGAs = lgaData.map(lga => lga.name);
+
+const CoverageMark = ({ subject, status }: { subject: string; status: CoreCoverageStatus }) => {
+  const settings = {
+    qualified: { icon: Check, label: "qualified teacher present", className: "bg-secondary/15 text-secondary" },
+    missing: { icon: X, label: "no qualified teacher", className: "bg-destructive/10 text-destructive" },
+    unverified: { icon: Minus, label: "teacher unqualified or unverified", className: "bg-accent/20 text-accent" },
+  }[status];
+  const Icon = settings.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold ${settings.className}`} title={`${subject}: ${settings.label}`}>
+      {subject}<Icon className="w-3.5 h-3.5" aria-hidden="true" /><span className="sr-only">: {settings.label}</span>
+    </span>
+  );
+};
 
 const SchoolsTab = () => {
   const [lgaFilter, setLgaFilter] = useState("");
@@ -12,123 +25,71 @@ const SchoolsTab = () => {
   const [locFilter, setLocFilter] = useState("");
   const [search, setSearch] = useState("");
 
-  const filtered = useMemo(() => {
-    return schoolsData.filter(s => {
-      if (lgaFilter && s.lga !== lgaFilter) return false;
-      if (typeFilter && s.type !== typeFilter) return false;
-      if (locFilter && s.location !== locFilter) return false;
-      if (search && !s.name.toLowerCase().includes(search.toLowerCase())) return false;
-      return true;
-    });
-  }, [lgaFilter, typeFilter, locFilter, search]);
+  const schoolRows = useMemo(() => schoolsData.map(school => ({ ...school, coverage: coreCoverageForSchool(school) })), []);
+  const fullCoverage = schoolRows.filter(row => Object.values(row.coverage).every(status => status === "qualified")).length;
+  const withCoreGap = schoolRows.length - fullCoverage;
+  const filtered = useMemo(() => schoolRows.filter(school => {
+    if (lgaFilter && school.lga !== lgaFilter) return false;
+    if (typeFilter && school.type !== typeFilter) return false;
+    if (locFilter && school.location !== locFilter) return false;
+    if (search && !school.name.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  }), [schoolRows, lgaFilter, typeFilter, locFilter, search]);
 
   const reset = () => { setLgaFilter(""); setTypeFilter(""); setLocFilter(""); setSearch(""); };
-  const specialNeeds = schoolsData.filter(s => s.type === "Special Needs").length;
-  const inclusive = schoolsData.filter(s => s.type === "Inclusive").length;
-
-  const typeBadge = (type: string) => {
-    if (type === "Mainstream") return "bg-kebbi-light text-secondary";
-    if (type === "Special Needs") return "bg-accent/20 text-accent";
-    return "bg-destructive/10 text-destructive";
-  };
 
   return (
     <div className="space-y-4 animate-fade-in">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-secondary">
-          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Schools Reported</p>
-          <p className="text-2xl font-display font-bold text-card-foreground">{reportedSchools.toLocaleString()}</p>
-          <p className="text-xs text-muted-foreground font-body mt-1">
-            {lgasWithSchoolData} of {lgaData.length} LGAs — remainder data pending
-          </p>
-        </div>
-        <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-accent">
-          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Special Needs Schools</p>
-          <p className="text-2xl font-display font-bold text-card-foreground">{statewide.senSchools}</p>
-          <p className="text-xs text-muted-foreground font-body mt-1">
-            {statewide.senLearners.toLocaleString()} learners statewide
-          </p>
-        </div>
-        <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-destructive">
-          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Learners Enrolled</p>
-          <p className="text-2xl font-display font-bold text-card-foreground">{statewide.students.toLocaleString()}</p>
-          <p className="text-xs text-muted-foreground font-body mt-1">All {lgaData.length} LGAs reporting</p>
-        </div>
+        {[
+          ["Total Schools", reportedSchools, "Reported across available LGA returns", "border-l-secondary"],
+          ["Schools with Full Core Coverage", fullCoverage, "Illustrative directory sample · Estimated", "border-l-accent"],
+          ["Schools with at Least One Core Gap", withCoreGap, "Illustrative directory sample · Estimated", "border-l-destructive"],
+        ].map(([title, value, note, border]) => (
+          <div key={String(title)} className={`bg-card rounded-md p-4 shadow-sm border-l-4 ${border}`}>
+            <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">{title}</p>
+            <p className="text-2xl font-display font-bold text-card-foreground mt-1">{Number(value).toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground font-body mt-1">{note}</p>
+          </div>
+        ))}
       </div>
 
       <p className="text-xs text-muted-foreground font-body flex items-start gap-2">
         <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-        <span>
-          {PARTIAL_DATA_NOTE} The directory below shows illustrative school records used to demonstrate search and filtering;
-          it will be replaced by authorised KbSUBEB school-level records. Special needs counts: {specialNeeds} in the sample,
-          {" "}{inclusive} inclusive.
-        </span>
+        <span>The directory is illustrative pending authorised school-level records. Core coverage is inferred from the listed staffing record and marked unverified where qualification cannot be confirmed.</span>
       </p>
-
 
       <div className="bg-card rounded-md p-4 shadow-sm">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <select value={lgaFilter} onChange={e => setLgaFilter(e.target.value)} className="border border-border rounded-md px-2 py-1.5 text-sm bg-card font-body focus:ring-2 focus:ring-accent focus:outline-none">
-            <option value="">All LGAs</option>
-            {allLGAs.map(l => <option key={l} value={l}>{l}</option>)}
+          <select aria-label="Filter by LGA" value={lgaFilter} onChange={event => setLgaFilter(event.target.value)} className="border border-border rounded-md px-2 py-1.5 text-sm bg-card font-body focus:ring-2 focus:ring-accent focus:outline-none">
+            <option value="">All LGAs</option>{allLGAs.map(lga => <option key={lga}>{lga}</option>)}
           </select>
-          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="border border-border rounded-md px-2 py-1.5 text-sm bg-card font-body focus:ring-2 focus:ring-accent focus:outline-none">
-            <option value="">All Types</option>
-            <option value="Mainstream">Mainstream</option>
-            <option value="Special Needs">Special Needs</option>
-            <option value="Inclusive">Inclusive</option>
+          <select aria-label="Filter by school type" value={typeFilter} onChange={event => setTypeFilter(event.target.value)} className="border border-border rounded-md px-2 py-1.5 text-sm bg-card font-body focus:ring-2 focus:ring-accent focus:outline-none">
+            <option value="">All Types</option><option>Mainstream</option><option>Special Needs</option><option>Inclusive</option>
           </select>
-          <select value={locFilter} onChange={e => setLocFilter(e.target.value)} className="border border-border rounded-md px-2 py-1.5 text-sm bg-card font-body focus:ring-2 focus:ring-accent focus:outline-none">
-            <option value="">All Locations</option>
-            <option value="Urban">Urban</option>
-            <option value="Rural">Rural</option>
+          <select aria-label="Filter by location" value={locFilter} onChange={event => setLocFilter(event.target.value)} className="border border-border rounded-md px-2 py-1.5 text-sm bg-card font-body focus:ring-2 focus:ring-accent focus:outline-none">
+            <option value="">All Locations</option><option>Urban</option><option>Rural</option>
           </select>
-          <input
-            type="text"
-            placeholder="Search school..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="border border-border rounded-md px-2 py-1.5 text-sm bg-card font-body focus:ring-2 focus:ring-accent focus:outline-none"
-          />
-          <button onClick={reset} className="bg-secondary text-secondary-foreground rounded-md px-3 py-1.5 text-sm font-display font-semibold hover:opacity-90">
-            Reset
-          </button>
+          <input aria-label="Search schools" type="search" placeholder="Search school..." value={search} onChange={event => setSearch(event.target.value)} className="border border-border rounded-md px-2 py-1.5 text-sm bg-card font-body focus:ring-2 focus:ring-accent focus:outline-none" />
+          <Button variant="secondary" size="sm" onClick={reset}>Reset</Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2 font-body">{filtered.length} record(s) found</p>
       </div>
 
       <div className="bg-card rounded-md shadow-sm overflow-x-auto">
         {filtered.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-muted-foreground font-body">No records match your filters.</p>
-            <button onClick={reset} className="mt-3 bg-secondary text-secondary-foreground rounded-md px-4 py-2 text-sm font-display font-semibold hover:opacity-90">Reset Filters</button>
-          </div>
+          <div className="p-8 text-center"><p className="text-muted-foreground font-body">No records match your filters.</p><Button variant="secondary" className="mt-3" onClick={reset}>Reset Filters</Button></div>
         ) : (
           <table className="w-full text-sm font-body">
-            <thead>
-              <tr className="bg-muted text-left">
-                <th className="px-4 py-2 font-display font-semibold">School Name</th>
-                <th className="px-4 py-2 font-display font-semibold">LGA</th>
-                <th className="px-4 py-2 font-display font-semibold">Type</th>
-                <th className="px-4 py-2 font-display font-semibold">Location</th>
-                <th className="px-4 py-2 font-display font-semibold">Students</th>
-                <th className="px-4 py-2 font-display font-semibold">Disabled</th>
-                <th className="px-4 py-2 font-display font-semibold">Subjects</th>
+            <thead><tr className="bg-muted text-left">
+              {['School Name', 'LGA', 'Type', 'Location', 'Students', 'Disabled', 'Core Subject Coverage'].map(label => <th key={label} className="px-4 py-3 font-display font-semibold">{label}</th>)}
+            </tr></thead>
+            <tbody>{filtered.map((school, index) => (
+              <tr key={school.name} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
+                <td className="px-4 py-3 font-semibold">{school.name}</td><td className="px-4 py-3">{school.lga}</td><td className="px-4 py-3">{school.type}</td><td className="px-4 py-3">{school.location}</td><td className="px-4 py-3">{school.students.toLocaleString()}</td><td className="px-4 py-3">{school.disabled}</td>
+                <td className="px-4 py-3"><div className="flex gap-1.5 flex-wrap"><CoverageMark subject="Maths" status={school.coverage.maths} /><CoverageMark subject="English" status={school.coverage.english} /><CoverageMark subject="Science" status={school.coverage.science} /></div></td>
               </tr>
-            </thead>
-            <tbody>
-              {filtered.map((s, i) => (
-                <tr key={s.name} className={i % 2 === 0 ? "bg-card" : "bg-muted/30"}>
-                  <td className="px-4 py-2 font-semibold">{s.name}</td>
-                  <td className="px-4 py-2">{s.lga}</td>
-                  <td className="px-4 py-2"><span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${typeBadge(s.type)}`}>{s.type}</span></td>
-                  <td className="px-4 py-2">{s.location}</td>
-                  <td className="px-4 py-2">{s.students.toLocaleString()}</td>
-                  <td className="px-4 py-2">{s.disabled}</td>
-                  <td className="px-4 py-2 text-xs">{s.subjects}</td>
-                </tr>
-              ))}
-            </tbody>
+            ))}</tbody>
           </table>
         )}
       </div>

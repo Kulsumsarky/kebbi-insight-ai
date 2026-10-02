@@ -3,12 +3,11 @@ import { Menu, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export const tabs = [
-  "AI Predictions",
-  "Academic Health",
   "Overview",
-  "Teacher Density",
-  "Teachers",
+  "Teacher Gaps",
+  "Deployment",
   "Schools",
+  "AI Recommendations",
 ];
 
 interface TabNavProps {
