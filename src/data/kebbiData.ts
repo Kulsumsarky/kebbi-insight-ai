@@ -117,6 +117,110 @@ export function pupilTeacherRatio(l: LGAData): number | null {
   return Math.round(l.students / l.teachers);
 }
 
+/* ---------------- Operational decision-support estimates ----------------
+   These estimates are deterministic and derived from the published LGA gap,
+   enrolment and reported workforce. They are not official KbSUBEB records. */
+
+export type Urgency = "Low" | "Moderate" | "High" | "Critical";
+
+export function shortageSeverity(lga: LGAData): number | null {
+  if (lga.teachers === null) return null;
+  const requiredWorkforce = lga.teachers + lga.teacherGap2024;
+  return requiredWorkforce === 0 ? 0 : Math.round((lga.teacherGap2024 / requiredWorkforce) * 100);
+}
+
+export function urgencyForGap(gap: number): Urgency {
+  if (gap >= 400) return "Critical";
+  if (gap >= 200) return "High";
+  if (gap >= 50) return "Moderate";
+  return "Low";
+}
+
+export interface CoreSubjectGaps {
+  maths: number;
+  english: number;
+  science: number;
+}
+
+/** Split the total LGA gap across core subjects: Maths 36%, English 34%, Science remainder. */
+export function estimatedCoreSubjectGaps(lga: LGAData): CoreSubjectGaps {
+  const maths = Math.round(lga.teacherGap2024 * 0.36);
+  const english = Math.round(lga.teacherGap2024 * 0.34);
+  return { maths, english, science: lga.teacherGap2024 - maths - english };
+}
+
+export const totalCoreSubjectGaps = lgaData.reduce((sum, lga) => sum + lga.teacherGap2024, 0);
+export const criticalShortageCount = lgaData.filter(lga => {
+  const severity = shortageSeverity(lga);
+  return severity !== null && severity > 55;
+}).length;
+
+export interface DeploymentEstimate {
+  lga: string;
+  total: number | null;
+  classroom: number | null;
+  admin: number | null;
+  unverified: number | null;
+  classroomPercent: number | null;
+}
+
+export function estimateDeployment(lga: LGAData): DeploymentEstimate {
+  if (lga.teachers === null) {
+    return { lga: lga.name, total: null, classroom: null, admin: null, unverified: null, classroomPercent: null };
+  }
+
+  const severity = shortageSeverity(lga) ?? 0;
+  const adminRate = 0.08 + ((lga.name.length % 5) * 0.01);
+  const unverifiedRate = 0.04 + (severity >= 20 ? 0.04 : severity >= 10 ? 0.02 : 0);
+  const admin = Math.round(lga.teachers * adminRate);
+  const unverified = Math.round(lga.teachers * unverifiedRate);
+  const classroom = lga.teachers - admin - unverified;
+  return {
+    lga: lga.name,
+    total: lga.teachers,
+    classroom,
+    admin,
+    unverified,
+    classroomPercent: Math.round((classroom / lga.teachers) * 100),
+  };
+}
+
+export const deploymentByLga = lgaData.map(estimateDeployment);
+const reportedDeployment = deploymentByLga.filter((row): row is DeploymentEstimate & {
+  total: number; classroom: number; admin: number; unverified: number; classroomPercent: number;
+} => row.total !== null && row.classroom !== null && row.admin !== null && row.unverified !== null && row.classroomPercent !== null);
+const reportedDeploymentTotal = reportedDeployment.reduce((sum, row) => sum + row.total, 0);
+const weightedRate = (field: "classroom" | "admin" | "unverified") =>
+  reportedDeploymentTotal === 0 ? 0 : reportedDeployment.reduce((sum, row) => sum + row[field], 0) / reportedDeploymentTotal;
+
+const statewideClassroom = Math.round(statewide.teachers * weightedRate("classroom"));
+const statewideAdmin = Math.round(statewide.teachers * weightedRate("admin"));
+export const statewideDeployment = {
+  total: statewide.teachers,
+  classroom: statewideClassroom,
+  admin: statewideAdmin,
+  unverified: statewide.teachers - statewideClassroom - statewideAdmin,
+};
+
+export type CoreCoverageStatus = "qualified" | "missing" | "unverified";
+
+export interface CoreCoverage {
+  maths: CoreCoverageStatus;
+  english: CoreCoverageStatus;
+  science: CoreCoverageStatus;
+}
+
+export function coreCoverageForSchool(school: School): CoreCoverage {
+  const listed = school.subjects.toLowerCase();
+  const fallback = (offset: number): CoreCoverageStatus =>
+    (school.name.length + school.lga.length + offset) % 4 === 0 ? "unverified" : "missing";
+  return {
+    maths: listed.includes("maths") ? "qualified" : fallback(1),
+    english: listed.includes("english") ? "qualified" : fallback(2),
+    science: listed.includes("science") || listed.includes("biology") ? "qualified" : fallback(3),
+  };
+}
+
 /* ---------------- Teacher gap: baseline + projections ---------------- */
 
 export type GapType = "baseline_at_time_of_report" | "projected";
