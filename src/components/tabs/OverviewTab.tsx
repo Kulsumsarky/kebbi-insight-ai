@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import {
-  criticalShortageCount, DNEMIS_NOTE, lgaData, statewide, statewideDeployment,
-  totalCoreSubjectGaps, shortageSeverity,
+  dnemisLgaData, dnemisTotals, DNEMIS_LTR_STANDARD, DNEMIS_NOTE, statewideDeployment,
 } from "@/data/kebbiData";
 import { ChevronDown, ChevronUp, Scale } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 
-const gapColour = (gap: number) => {
-  if (gap >= 400) return "hsl(var(--destructive))";
-  if (gap >= 200) return "hsl(var(--warning))";
-  if (gap >= 50) return "hsl(var(--accent))";
+const gapColour = (urgency: string) => {
+  if (urgency === "Critical") return "hsl(var(--destructive))";
+  if (urgency === "High") return "hsl(var(--warning))";
+  if (urgency === "Moderate") return "hsl(var(--accent))";
   return "hsl(var(--secondary))";
 };
 
@@ -27,22 +26,21 @@ const MetricCard = ({ title, value, note, border }: { title: string; value: numb
 
 const OverviewTab = () => {
   const [dnemisOpen, setDnemisOpen] = useState(false);
-  const gapChartData = [...lgaData].sort((a, b) => b.teacherGap2024 - a.teacherGap2024).map(lga => ({ name: lga.name, gap: lga.teacherGap2024 }));
-  const topTeachers = lgaData.filter(lga => lga.teachers !== null).sort((a, b) => (b.teachers ?? 0) - (a.teachers ?? 0)).slice(0, 8).map(lga => ({ name: lga.name, teachers: lga.teachers ?? 0 }));
-  const classifiedLgas = lgaData.filter(lga => shortageSeverity(lga) !== null).length;
+  const gapChartData = [...dnemisLgaData].sort((a, b) => b.ltr - a.ltr).map(lga => ({ name: lga.lga, ltr: lga.ltr, urgency: lga.urgency }));
+  const topTeachers = [...dnemisLgaData].sort((a, b) => b.teachers - a.teachers).slice(0, 8).map(lga => ({ name: lga.lga, teachers: lga.teachers }));
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard title="Total Teachers Deployed" value={statewide.teachers} note="Published statewide workforce" border="border-l-secondary" />
-        <MetricCard title="LGAs at Critical Shortage" value={criticalShortageCount} note={`Above 55% of required workforce · ${classifiedLgas} LGAs classifiable`} border="border-l-destructive" />
-        <MetricCard title="Subject Gaps Identified" value={totalCoreSubjectGaps} note="Estimated Maths, English and Science shortfalls" border="border-l-warning" />
+        <MetricCard title="Total Teachers Deployed" value={dnemisTotals.teachers} note="DNEMIS Annual School Census 2024" border="border-l-secondary" />
+        <MetricCard title="LGAs at Critical Shortage" value={dnemisTotals.criticalLgas} note="DNEMIS urgency classification" border="border-l-destructive" />
+        <MetricCard title="Subject Gaps Identified" value={dnemisTotals.subjectGaps} note="Estimated Maths, English and Science shortfalls" border="border-l-warning" />
         <MetricCard title="Teachers Misdeployed" value={statewideDeployment.admin} note="Estimated in admin or area offices" border="border-l-accent" />
       </div>
 
       <div className="bg-card rounded-md shadow-sm border-l-4 border-l-accent">
         <button onClick={() => setDnemisOpen(!dnemisOpen)} className="w-full flex items-center justify-between gap-2 p-4 text-left hover:bg-muted/50 transition-colors">
-          <span className="flex items-center gap-2 font-display font-semibold text-sm text-card-foreground"><Scale className="w-4 h-4 text-accent" />Why these figures may differ from DNEMIS</span>
+          <span className="flex items-center gap-2 font-display font-semibold text-sm text-card-foreground"><Scale className="w-4 h-4 text-accent" />About the DNEMIS figures</span>
           {dnemisOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
         {dnemisOpen && <p className="px-4 pb-4 text-sm font-body text-muted-foreground animate-fade-in">{DNEMIS_NOTE}</p>}
@@ -50,13 +48,13 @@ const OverviewTab = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-card rounded-md p-4 shadow-sm">
-          <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Gap Severity by LGA — 2024 Baseline</h3>
+          <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Gap Severity by LGA — DNEMIS 2024 LTR</h3>
           <ResponsiveContainer width="100%" height={320}>
             <BarChart data={gapChartData} margin={{ left: 0, right: 0 }}>
               <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" height={85} />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip formatter={(value: number) => [`${value} teachers`, "Gap"]} />
-              <Bar dataKey="gap" radius={[2, 2, 0, 0]}>{gapChartData.map(entry => <Cell key={entry.name} fill={gapColour(entry.gap)} />)}</Bar>
+              <Tooltip formatter={(value: number) => [`1:${value.toFixed(1)}`, `LTR (standard 1:${DNEMIS_LTR_STANDARD})`]} />
+              <Bar dataKey="ltr" radius={[2, 2, 0, 0]}>{gapChartData.map(entry => <Cell key={entry.name} fill={gapColour(entry.urgency)} />)}</Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
