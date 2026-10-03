@@ -1,8 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 import {
-  estimatedCoreSubjectGaps, lgaData, pupilTeacherRatio, urgencyForGap,
+  dnemisLgaData, DNEMIS_LTR_STANDARD, estimatedCoreGapsFromDnemis,
 } from "@/data/kebbiData";
-import PendingBadge from "@/components/PendingBadge";
 
 const urgencyClass = {
   Low: "bg-secondary/15 text-secondary",
@@ -26,30 +25,32 @@ const TeacherGapsTab = () => (
           <tr className="bg-muted text-left">
             <th className="px-4 py-3 font-display font-semibold">LGA</th>
             <th className="px-4 py-3 font-display font-semibold">Schools</th>
-            <th className="px-4 py-3 font-display font-semibold">Total Teachers</th>
+            <th className="px-4 py-3 font-display font-semibold">Learners</th>
+            <th className="px-4 py-3 font-display font-semibold">Teachers</th>
+            <th className="px-4 py-3 font-display font-semibold">Female Teachers</th>
             <th className="px-4 py-3 font-display font-semibold">Maths Gap</th>
             <th className="px-4 py-3 font-display font-semibold">English Gap</th>
             <th className="px-4 py-3 font-display font-semibold">Science Gap</th>
-            <th className="px-4 py-3 font-display font-semibold">Pupil:Teacher Ratio</th>
+            <th className="px-4 py-3 font-display font-semibold">Learner-Teacher Ratio</th>
             <th className="px-4 py-3 font-display font-semibold">Urgency</th>
           </tr>
         </thead>
         <tbody>
-          {lgaData.map((lga, index) => {
-            const gaps = estimatedCoreSubjectGaps(lga);
-            const ratio = pupilTeacherRatio(lga);
-            const urgency = urgencyForGap(lga.teacherGap2024);
+          {dnemisLgaData.map((lga, index) => {
+            const gaps = estimatedCoreGapsFromDnemis(lga);
             return (
-              <tr key={lga.name} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
-                <td className="px-4 py-3 font-semibold">{lga.name}</td>
-                <td className="px-4 py-3">{lga.totalSchools === null ? <PendingBadge /> : lga.totalSchools.toLocaleString()}</td>
-                <td className="px-4 py-3">{lga.teachers === null ? <PendingBadge /> : lga.teachers.toLocaleString()}</td>
+              <tr key={lga.lga} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
+                <td className="px-4 py-3 font-semibold">{lga.lga}</td>
+                <td className="px-4 py-3">{lga.schools.toLocaleString()}</td>
+                <td className="px-4 py-3">{lga.learners.toLocaleString()}</td>
+                <td className="px-4 py-3">{lga.teachers.toLocaleString()}</td>
+                <td className="px-4 py-3">{lga.femaleTeachersPct.toFixed(1)}%</td>
                 <td className="px-4 py-3">{gaps.maths.toLocaleString()} <span className="text-xs text-muted-foreground">(est.)</span></td>
                 <td className="px-4 py-3">{gaps.english.toLocaleString()} <span className="text-xs text-muted-foreground">(est.)</span></td>
                 <td className="px-4 py-3">{gaps.science.toLocaleString()} <span className="text-xs text-muted-foreground">(est.)</span></td>
-                <td className="px-4 py-3">{ratio === null ? <PendingBadge /> : `1:${ratio}`}</td>
+                <td className="px-4 py-3">1:{lga.ltr.toFixed(1)}</td>
                 <td className="px-4 py-3">
-                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${urgencyClass[urgency]}`}>{urgency}</span>
+                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${urgencyClass[lga.urgency]}`}>{lga.urgency}</span>
                 </td>
               </tr>
             );
@@ -58,7 +59,7 @@ const TeacherGapsTab = () => (
       </table>
     </div>
     <p className="text-xs text-muted-foreground font-body">
-      Estimate method: each published LGA teacher gap is allocated 36% to Maths, 34% to English and 30% to Science; rounded values always reconcile to the published total gap.
+      Subject-gap estimate only: additional teachers needed to reach the Kebbi UBE standard of 1:{DNEMIS_LTR_STANDARD} are allocated 36% to Maths, 34% to English and 30% to Science. DNEMIS does not publish subject-level staffing in this dataset.
     </p>
   </div>
 );
