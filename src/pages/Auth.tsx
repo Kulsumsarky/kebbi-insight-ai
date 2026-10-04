@@ -27,7 +27,7 @@ const Auth = () => {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate("/", { replace: true });
+    if (!loading && user) navigate("/dashboard", { replace: true });
   }, [user, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,14 +71,14 @@ const Auth = () => {
         });
         if (error) throw error;
         toast.success("Account created. You are signed in.");
-        navigate("/", { replace: true });
+        navigate("/dashboard", { replace: true });
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: parsed.data.email,
           password: parsed.data.password,
         });
         if (error) throw error;
-        navigate("/", { replace: true });
+        navigate("/dashboard", { replace: true });
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Authentication failed";
@@ -99,7 +99,7 @@ const Auth = () => {
       return;
     }
     if (result.redirected) return;
-    navigate("/", { replace: true });
+    navigate("/dashboard", { replace: true });
   };
 
   return (
