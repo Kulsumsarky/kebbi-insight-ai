@@ -66,7 +66,7 @@ const Landing = () => (
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-primary-foreground border-primary-foreground/40 hover:bg-secondary font-display">
+            <Button asChild size="lg" variant="outline" className="bg-transparent text-primary-foreground border-primary-foreground/40 hover:bg-secondary hover:text-accent font-display">
               <Link to="/auth">Sign in / Register</Link>
             </Button>
           </div>
