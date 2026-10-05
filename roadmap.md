@@ -8,3 +8,5 @@
 - [x] Update navigation, header subtitle, and page metadata
 - [x] Remove specified SEN, vocational-readiness, and mandate references from active UI
 - [x] Verify authenticated desktop and mobile flows across the updated tabs
+- [x] Add public landing page as the first screen, routing into the protected dashboard
+- [x] Show official email and LinkedIn on the landing page; remove confidential statewide figures from it
