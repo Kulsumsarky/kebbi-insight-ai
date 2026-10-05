@@ -161,7 +161,7 @@ const HeroIllustration = () => (
       </div>
 
       {/* floating card: gap analysis */}
-      <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6 bg-card border border-border rounded-xl shadow-md p-3 w-36 md:w-44">
+      <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-card border border-border rounded-xl shadow-md p-3 w-36 md:w-44">
         <p className="text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
           Gap analysis
         </p>
@@ -187,12 +187,12 @@ const Landing = () => (
             className="w-10 h-10 md:w-11 md:h-11 rounded-full border-2 border-accent object-cover"
           />
           <span className="font-display font-bold text-xl md:text-2xl text-foreground tracking-tight">
-            EduMap <span className="text-primary">Kebbi</span>
+            EduMap <span className="text-primary">NG</span>
           </span>
         </div>
         <p className="hidden sm:flex items-center gap-2 text-[11px] font-body font-semibold uppercase tracking-widest text-muted-foreground">
           <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-          Introducing EduMap Kebbi
+          Introducing EduMap NG
         </p>
       </div>
     </header>
@@ -210,7 +210,7 @@ const Landing = () => (
               <span className="text-primary">mapped.</span>
             </h2>
             <p className="text-muted-foreground font-body text-base md:text-lg max-w-lg mb-5">
-              EduMap Kebbi gives Ministry officials, LGA secretaries and school administrators a shared,
+              EduMap NG gives Ministry officials, LGA secretaries and school administrators a shared,
               evidence-based view of teacher deployment, resource gaps and staffing capacity across all 21 LGAs.
             </p>
             <p className="font-display font-semibold text-foreground text-sm mb-6">
