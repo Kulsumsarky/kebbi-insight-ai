@@ -17,6 +17,7 @@ import {
   Users,
 } from "lucide-react";
 import kebbiSeal from "@/assets/kebbi-seal.jpg";
+import nigeriaMap from "@/assets/nigeria-kebbi-map.png";
 import { Button } from "@/components/ui/button";
 import { DATA_SOURCE } from "@/data/kebbiData";
 
@@ -128,28 +129,27 @@ const HeroIllustration = () => (
       className="relative rounded-2xl border border-border bg-secondary/60 overflow-hidden p-6 md:p-8"
       style={gridStyle}
     >
-      {/* dashed connectors */}
-      <svg className="absolute inset-0 w-full h-full" aria-hidden="true">
-        <line x1="18%" y1="38%" x2="52%" y2="52%" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeDasharray="5 6" opacity="0.5" />
-        <line x1="78%" y1="26%" x2="56%" y2="48%" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeDasharray="5 6" opacity="0.5" />
-        <line x1="30%" y1="80%" x2="52%" y2="60%" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeDasharray="5 6" opacity="0.5" />
-      </svg>
-
-      {/* location dots */}
-      <span className="absolute left-[14%] top-[34%] w-2.5 h-2.5 rounded-full bg-primary/60" />
-      <span className="absolute left-[80%] top-[24%] w-2.5 h-2.5 rounded-full bg-primary/60" />
-      <span className="absolute left-[28%] top-[82%] w-2.5 h-2.5 rounded-full bg-primary/60" />
-
-      {/* central pin badge */}
-      <div className="relative flex items-center justify-center py-10">
-        <div className="relative">
-          <div className="w-36 h-36 md:w-44 md:h-44 rounded-full bg-card border-4 border-primary/15 shadow-lg flex items-center justify-center">
-            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-primary flex items-center justify-center shadow-md">
-              <GraduationCap className="w-12 h-12 md:w-14 md:h-14 text-primary-foreground" />
-            </div>
-          </div>
-          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[18px] border-t-primary" />
+      {/* Map of Nigeria with Kebbi State highlighted */}
+      <div className="relative mx-auto w-full max-w-md aspect-square">
+        <img
+          src={nigeriaMap}
+          alt="Map of Nigeria with Kebbi State highlighted in gold"
+          width={1024}
+          height={1024}
+          className="w-full h-full object-contain drop-shadow-md"
+        />
+        {/* Logo pinned inside Kebbi State */}
+        <div className="absolute left-[15.5%] top-[27%] -translate-x-1/2 -translate-y-1/2">
+          <span className="absolute inset-0 rounded-full bg-accent/50 animate-ping" />
+          <img
+            src={kebbiSeal}
+            alt="Kebbi State Seal"
+            className="relative w-11 h-11 md:w-14 md:h-14 rounded-full border-2 border-card shadow-lg object-cover"
+          />
         </div>
+        <span className="absolute left-[15.5%] top-[40%] -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-display font-semibold px-2 py-0.5 rounded-full shadow">
+          Kebbi State
+        </span>
       </div>
 
       {/* floating card: planning signals */}
@@ -161,7 +161,7 @@ const HeroIllustration = () => (
       </div>
 
       {/* floating card: gap analysis */}
-      <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6 bg-card border border-border rounded-xl shadow-md p-3 w-36 md:w-44">
+      <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-card border border-border rounded-xl shadow-md p-3 w-36 md:w-44">
         <p className="text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
           Gap analysis
         </p>
@@ -187,12 +187,12 @@ const Landing = () => (
             className="w-10 h-10 md:w-11 md:h-11 rounded-full border-2 border-accent object-cover"
           />
           <span className="font-display font-bold text-xl md:text-2xl text-foreground tracking-tight">
-            EduMap <span className="text-primary">Kebbi</span>
+            EduMap <span className="text-primary">NG</span>
           </span>
         </div>
         <p className="hidden sm:flex items-center gap-2 text-[11px] font-body font-semibold uppercase tracking-widest text-muted-foreground">
           <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-          Introducing EduMap Kebbi
+          Introducing EduMap NG
         </p>
       </div>
     </header>
@@ -210,7 +210,7 @@ const Landing = () => (
               <span className="text-primary">mapped.</span>
             </h2>
             <p className="text-muted-foreground font-body text-base md:text-lg max-w-lg mb-5">
-              EduMap Kebbi gives Ministry officials, LGA secretaries and school administrators a shared,
+              EduMap NG gives Ministry officials, LGA secretaries and school administrators a shared,
               evidence-based view of teacher deployment, resource gaps and staffing capacity across all 21 LGAs.
             </p>
             <p className="font-display font-semibold text-foreground text-sm mb-6">

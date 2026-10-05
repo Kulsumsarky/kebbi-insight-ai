@@ -72,7 +72,7 @@ const ResetPassword = () => {
             alt="Kebbi State Seal"
             className="w-16 h-16 rounded-full border-2 border-accent object-cover mx-auto mb-3"
           />
-          <h1 className="text-primary-foreground font-display font-bold text-2xl">EduMap Kebbi</h1>
+          <h1 className="text-primary-foreground font-display font-bold text-2xl">EduMap NG</h1>
           <p className="text-accent text-sm font-display">Set a new password</p>
         </div>
 
