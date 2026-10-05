@@ -17,6 +17,7 @@ import {
   Users,
 } from "lucide-react";
 import kebbiSeal from "@/assets/kebbi-seal.jpg";
+import nigeriaMap from "@/assets/nigeria-kebbi-map.png";
 import { Button } from "@/components/ui/button";
 import { DATA_SOURCE } from "@/data/kebbiData";
 
