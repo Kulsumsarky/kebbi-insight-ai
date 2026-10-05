@@ -14,7 +14,7 @@ const Header = () => {
           <img src={kebbiSeal} alt="Kebbi State Seal" className="w-[52px] h-[52px] rounded-full border-2 border-accent object-cover" />
         </div>
         <div className="text-center flex-1 px-4">
-          <h1 className="text-primary-foreground font-display font-bold text-lg md:text-xl tracking-tight">EduMap Kebbi</h1>
+          <h1 className="text-primary-foreground font-display font-bold text-lg md:text-xl tracking-tight">EduMap NG</h1>
           <p className="text-accent text-xs md:text-sm font-display">Teacher Deployment &amp; Gap Intelligence — Kebbi State</p>
         </div>
         <div className="flex items-center gap-3">

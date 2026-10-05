@@ -111,7 +111,7 @@ const Auth = () => {
             alt="Kebbi State Seal"
             className="w-16 h-16 rounded-full border-2 border-accent object-cover mx-auto mb-3"
           />
-          <h1 className="text-primary-foreground font-display font-bold text-2xl">EduMap Kebbi</h1>
+          <h1 className="text-primary-foreground font-display font-bold text-2xl">EduMap NG</h1>
           <p className="text-accent text-sm font-display">Secure Access — Education Intelligence Platform</p>
           <div className="mt-3 inline-flex items-center gap-2 text-xs text-primary-foreground/90 font-body bg-primary-foreground/10 rounded-full px-3 py-1">
             <span className="font-semibold">Signed in as:</span>
