@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
+  ArrowUpRight,
   BarChart3,
   Building2,
   CheckCircle2,
   ClipboardList,
+  GraduationCap,
   Linkedin,
   Mail,
   MapPin,
@@ -15,39 +17,38 @@ import {
   Users,
 } from "lucide-react";
 import kebbiSeal from "@/assets/kebbi-seal.jpg";
-import kebbiMap from "@/assets/kebbi-map.jpg";
 import { Button } from "@/components/ui/button";
 import { DATA_SOURCE } from "@/data/kebbiData";
 
 const CONTACT_EMAIL = "edumapng.kebbi@gmail.com";
 const LINKEDIN_HANDLE = "@edumapng";
-const LINKEDIN_URL = "https://www.linkedin.com/in/edumapng";
+const LINKEDIN_URL = "https://www.linkedin.com/company/edumapng";
 
 const whatItDoes = [
   {
     icon: School,
     title: "Maps every LGA in one view",
-    text: "Bring schools, learners and teachers for all 21 local government areas together in a single, consistent picture — no more reconciling separate spreadsheets.",
+    text: "Schools, learners and teachers for all 21 local government areas in a single, consistent picture.",
   },
   {
     icon: BarChart3,
     title: "Pinpoints where the gaps are",
-    text: "Urgency ratings, learner–teacher ratios and estimated subject shortfalls show which areas are under-resourced, and how badly, before the next recruitment round.",
+    text: "Urgency ratings, learner–teacher ratios and subject shortfalls show which areas are under-resourced, and how badly.",
   },
   {
     icon: Users,
     title: "Checks whether deployment adds up",
-    text: "Follows posted teachers through to the classroom, separating those actually teaching from those sitting in administrative offices and those unaccounted for.",
+    text: "Separates teachers actually in classrooms from those in administrative offices and those unaccounted for.",
   },
   {
     icon: Target,
     title: "Ranks what to act on first",
-    text: "Turns the analysis into a priority-ordered list of recommended actions, so limited recruitment capacity goes to the areas with the greatest need.",
+    text: "A priority-ordered list of recommended actions, so limited recruitment capacity goes where the need is greatest.",
   },
   {
     icon: Sparkles,
     title: "Writes the brief for you",
-    text: "Generates a structured intelligence report from the current figures, ready to circulate to the Ministry, LGA secretaries and development partners.",
+    text: "Generates a structured intelligence report, ready to circulate to the Ministry, LGA secretaries and partners.",
   },
 ];
 
@@ -56,19 +57,19 @@ const howItWorks = [
     step: "1",
     icon: ClipboardList,
     title: "Load the official records",
-    text: "Verified census and ministry data is imported once and held centrally, so every user is looking at the same numbers.",
+    text: "Verified census and ministry data is imported once and held centrally, so every user sees the same numbers.",
   },
   {
     step: "2",
     icon: Search,
     title: "Filter and investigate",
-    text: "Narrow by local government area, school type, location or subject, and compare areas side by side until the pattern is clear.",
+    text: "Narrow by LGA, school type, location or subject, and compare areas side by side until the pattern is clear.",
   },
   {
     step: "3",
     icon: CheckCircle2,
     title: "Decide and act",
-    text: "Leave with a defensible shortlist of where to post, recruit or intervene — and a written report to back the decision.",
+    text: "Leave with a defensible shortlist of where to post, recruit or intervene — and a written report to back it.",
   },
 ];
 
@@ -81,102 +82,217 @@ const whoFor = [
   {
     icon: MapPin,
     title: "LGA Secretaries",
-    text: "See your own area's shortages and staffing gaps in context, and make the case for support with evidence.",
+    text: "See your area's shortages and staffing gaps in context, and make the case for support with evidence.",
   },
   {
     icon: School,
     title: "School Administrators",
-    text: "Understand how your school's coverage compares with neighbouring areas and what your staffing position means for learners.",
+    text: "Understand how your school's coverage compares with neighbouring areas and what it means for learners.",
   },
 ];
 
+const gridStyle = {
+  backgroundImage:
+    "linear-gradient(hsl(var(--border) / 0.55) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--border) / 0.55) 1px, transparent 1px)",
+  backgroundSize: "28px 28px",
+};
+
+const MiniBars = () => (
+  <div className="flex items-end gap-1.5 h-10">
+    {[38, 55, 30, 62, 45, 78, 58].map((h, i) => (
+      <div
+        key={i}
+        className={`w-3 rounded-sm ${i === 5 ? "bg-accent" : "bg-primary/70"}`}
+        style={{ height: `${h}%` }}
+      />
+    ))}
+  </div>
+);
+
+const MiniLine = () => (
+  <svg viewBox="0 0 120 44" className="w-full h-10" fill="none">
+    <polyline
+      points="4,36 24,30 44,32 64,22 84,24 104,10 116,6"
+      stroke="hsl(var(--primary))"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="116" cy="6" r="3.5" fill="hsl(var(--accent))" />
+  </svg>
+);
+
+const HeroIllustration = () => (
+  <div className="relative">
+    <div
+      className="relative rounded-2xl border border-border bg-secondary/60 overflow-hidden p-6 md:p-8"
+      style={gridStyle}
+    >
+      {/* dashed connectors */}
+      <svg className="absolute inset-0 w-full h-full" aria-hidden="true">
+        <line x1="18%" y1="38%" x2="52%" y2="52%" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeDasharray="5 6" opacity="0.5" />
+        <line x1="78%" y1="26%" x2="56%" y2="48%" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeDasharray="5 6" opacity="0.5" />
+        <line x1="30%" y1="80%" x2="52%" y2="60%" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeDasharray="5 6" opacity="0.5" />
+      </svg>
+
+      {/* location dots */}
+      <span className="absolute left-[14%] top-[34%] w-2.5 h-2.5 rounded-full bg-primary/60" />
+      <span className="absolute left-[80%] top-[24%] w-2.5 h-2.5 rounded-full bg-primary/60" />
+      <span className="absolute left-[28%] top-[82%] w-2.5 h-2.5 rounded-full bg-primary/60" />
+
+      {/* central pin badge */}
+      <div className="relative flex items-center justify-center py-10">
+        <div className="relative">
+          <div className="w-36 h-36 md:w-44 md:h-44 rounded-full bg-card border-4 border-primary/15 shadow-lg flex items-center justify-center">
+            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-primary flex items-center justify-center shadow-md">
+              <GraduationCap className="w-12 h-12 md:w-14 md:h-14 text-primary-foreground" />
+            </div>
+          </div>
+          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[18px] border-t-primary" />
+        </div>
+      </div>
+
+      {/* floating card: planning signals */}
+      <div className="absolute top-4 right-4 md:top-6 md:right-6 bg-card border border-border rounded-xl shadow-md p-3 w-36 md:w-44">
+        <p className="text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
+          Planning signals
+        </p>
+        <MiniLine />
+      </div>
+
+      {/* floating card: gap analysis */}
+      <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6 bg-card border border-border rounded-xl shadow-md p-3 w-36 md:w-44">
+        <p className="text-[10px] font-display font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
+          Gap analysis
+        </p>
+        <MiniBars />
+      </div>
+    </div>
+    <p className="mt-2.5 flex items-center gap-2 text-[10px] font-body font-semibold uppercase tracking-widest text-muted-foreground">
+      <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+      Conceptual view · Illustrative data
+    </p>
+  </div>
+);
+
 const Landing = () => (
   <div className="min-h-screen bg-background flex flex-col">
-    <header className="bg-primary border-b-[3px] border-accent">
-      <div className="container flex items-center justify-between py-3">
+    {/* Top bar */}
+    <header className="bg-background/95 border-b border-border">
+      <div className="container flex items-center justify-between py-4">
         <div className="flex items-center gap-3">
-          <img src={kebbiSeal} alt="Kebbi State Seal" className="w-[52px] h-[52px] rounded-full border-2 border-accent object-cover" />
+          <img
+            src={kebbiSeal}
+            alt="Kebbi State Seal"
+            className="w-10 h-10 md:w-11 md:h-11 rounded-full border-2 border-accent object-cover"
+          />
+          <span className="font-display font-bold text-xl md:text-2xl text-foreground tracking-tight">
+            EduMap <span className="text-primary">Kebbi</span>
+          </span>
         </div>
-        <div className="text-center flex-1 px-4">
-          <h1 className="text-primary-foreground font-display font-bold text-lg md:text-xl tracking-tight">EduMap Kebbi</h1>
-          <p className="text-accent text-xs md:text-sm font-display">Teacher Deployment & Gap Intelligence — Kebbi State</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <img src={kebbiMap} alt="Kebbi State Map" className="w-[52px] h-[52px] rounded-md border-2 border-accent object-cover" />
-        </div>
+        <p className="hidden sm:flex items-center gap-2 text-[11px] font-body font-semibold uppercase tracking-widest text-muted-foreground">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+          Introducing EduMap Kebbi
+        </p>
       </div>
     </header>
 
     <main className="flex-1">
-      <section className="bg-primary text-primary-foreground">
-        <div className="container py-14 md:py-20 text-center max-w-3xl mx-auto">
-          <span className="inline-flex items-center gap-2 text-xs font-body bg-secondary text-accent rounded-full px-3 py-1 mb-5">
-            <MapPin className="w-3.5 h-3.5" />
-            Kebbi State, Nigeria
-          </span>
-          <h2 className="font-display font-bold text-3xl md:text-5xl leading-tight mb-4">
-            Know exactly where Kebbi's teachers are — and where they're missing.
-          </h2>
-          <p className="text-primary-foreground/90 font-body text-base md:text-lg mb-8">
-            EduMap Kebbi turns official education records into clear, decision-ready intelligence. It shows
-            where teachers are deployed, where the gaps are worst, and what to do about it first.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button asChild size="lg" className="bg-accent text-primary hover:bg-accent/90 font-display font-semibold">
-              <Link to="/dashboard">
-                Access the Dashboard
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="bg-transparent text-primary-foreground border-primary-foreground/40 hover:bg-secondary hover:text-accent font-display">
-              <Link to="/auth">Sign in / Register</Link>
-            </Button>
+      {/* Split hero */}
+      <section className="border-b border-border">
+        <div className="container py-12 md:py-20 grid gap-10 lg:grid-cols-2 lg:gap-14 items-center">
+          <div>
+            <p className="text-[11px] font-body font-semibold uppercase tracking-widest text-primary mb-4">
+              Teacher Deployment & Gap Intelligence
+            </p>
+            <h2 className="font-display font-bold text-4xl md:text-5xl xl:text-6xl leading-[1.05] tracking-tight text-foreground mb-5">
+              Kebbi's education gaps,{" "}
+              <span className="text-primary">mapped.</span>
+            </h2>
+            <p className="text-muted-foreground font-body text-base md:text-lg max-w-lg mb-5">
+              EduMap Kebbi gives Ministry officials, LGA secretaries and school administrators a shared,
+              evidence-based view of teacher deployment, resource gaps and staffing capacity across all 21 LGAs.
+            </p>
+            <p className="font-display font-semibold text-foreground text-sm mb-6">
+              Map gaps. Align action. Strengthen schools.
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-display font-semibold group">
+                <Link to="/dashboard">
+                  Explore dashboard
+                  <ArrowUpRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="bg-transparent border-primary/40 text-primary hover:bg-secondary hover:text-primary font-display font-semibold"
+              >
+                <Link to="/auth">Sign in / Register</Link>
+              </Button>
+            </div>
+            <p className="mt-3.5 text-xs text-muted-foreground font-body">
+              Sign-in required to view records and explore the dashboard.
+            </p>
           </div>
+          <HeroIllustration />
         </div>
       </section>
 
+      {/* What EduMap does */}
       <section className="container py-12 md:py-16">
-        <div className="max-w-2xl mx-auto text-center mb-9">
-          <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-3">What EduMap does</h2>
-          <p className="text-muted-foreground font-body">
-            Five jobs, done properly — from raw census records to a decision you can defend.
-          </p>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {whatItDoes.map(({ icon: Icon, title, text }) => (
-            <div
-              key={title}
-              className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200"
-            >
-              <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center mb-3">
-                <Icon className="w-5 h-5 text-secondary-foreground" />
-              </div>
+            <div key={title} className="group">
+              <Icon className="w-6 h-6 text-primary mb-3 transition-transform duration-200 group-hover:-translate-y-0.5" />
               <h3 className="font-display font-semibold text-foreground mb-1.5">{title}</h3>
               <p className="text-sm text-muted-foreground font-body">{text}</p>
             </div>
           ))}
+          {/* How it works folded in as the compact numbered list */}
+          <div className="lg:col-span-3 mt-4 pt-8 border-t border-border grid gap-8 md:grid-cols-3">
+            {howItWorks.map(({ step, icon: Icon, title, text }) => (
+              <div key={step} className="flex gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 font-display font-bold">
+                  {step}
+                </div>
+                <div>
+                  <h3 className="font-display font-semibold text-foreground mb-1">{title}</h3>
+                  <p className="text-sm text-muted-foreground font-body">{text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
+      {/* Who it's built for */}
       <section className="bg-secondary">
         <div className="container py-12 md:py-16">
-          <div className="max-w-2xl mx-auto text-center mb-9">
-            <h2 className="font-display font-bold text-2xl md:text-3xl text-secondary-foreground mb-3">How it works</h2>
-            <p className="text-secondary-foreground/80 font-body">
-              Three steps between a pile of census returns and a prioritised action list.
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-9">
+            <div>
+              <p className="text-[11px] font-body font-semibold uppercase tracking-widest text-primary mb-2">
+                Who it's built for
+              </p>
+              <h2 className="font-display font-bold text-2xl md:text-3xl text-secondary-foreground">
+                One platform, three vantage points
+              </h2>
+            </div>
+            <p className="text-sm text-secondary-foreground/80 font-body max-w-md">
+              Each sees the same facts from the angle that matters to them.
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {howItWorks.map(({ step, icon: Icon, title, text }) => (
+          <div className="grid gap-5 md:grid-cols-3">
+            {whoFor.map(({ icon: Icon, title, text }) => (
               <div
-                key={step}
-                className="bg-card border border-border rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-all duration-200"
+                key={title}
+                className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200"
               >
-                <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-4">
-                  <Icon className="w-6 h-6" />
+                <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center mb-3">
+                  <Icon className="w-5 h-5 text-secondary-foreground" />
                 </div>
-                <p className="text-xs font-display font-semibold text-accent uppercase tracking-wider mb-1">Step {step}</p>
-                <h3 className="font-display font-semibold text-foreground mb-2">{title}</h3>
+                <h3 className="font-display font-semibold text-foreground mb-1.5">{title}</h3>
                 <p className="text-sm text-muted-foreground font-body">{text}</p>
               </div>
             ))}
@@ -184,36 +300,16 @@ const Landing = () => (
         </div>
       </section>
 
+      {/* Closing CTA */}
       <section className="container py-12 md:py-16">
-        <div className="max-w-2xl mx-auto text-center mb-9">
-          <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-3">Who it's built for</h2>
-          <p className="text-muted-foreground font-body">
-            One platform, three vantage points — each sees the same facts from the angle that matters to them.
-          </p>
-        </div>
-        <div className="grid gap-5 md:grid-cols-3">
-          {whoFor.map(({ icon: Icon, title, text }) => (
-            <div
-              key={title}
-              className="border border-border border-l-4 border-l-accent bg-card rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200"
-            >
-              <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center mb-3">
-                <Icon className="w-5 h-5 text-secondary-foreground" />
-              </div>
-              <h3 className="font-display font-semibold text-foreground mb-1.5">{title}</h3>
-              <p className="text-sm text-muted-foreground font-body">{text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-primary text-primary-foreground">
-        <div className="container py-12 text-center max-w-2xl mx-auto">
-          <h2 className="font-display font-bold text-2xl md:text-3xl mb-3">Ready to see your LGA?</h2>
-          <p className="text-primary-foreground/85 font-body mb-7">
-            Access is restricted to authorised officials. Sign in with your account, or register to request access.
-          </p>
-          <Button asChild size="lg" className="bg-accent text-primary hover:bg-accent/90 font-display font-semibold">
+        <div className="rounded-2xl bg-primary text-primary-foreground px-6 py-10 md:px-12 md:py-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <h2 className="font-display font-bold text-2xl md:text-3xl mb-2">Ready to see your LGA?</h2>
+            <p className="text-primary-foreground/85 font-body max-w-xl">
+              Access is restricted to authorised officials. Sign in with your account, or register to request access.
+            </p>
+          </div>
+          <Button asChild size="lg" className="bg-accent text-primary hover:bg-accent/90 font-display font-semibold shrink-0">
             <Link to="/dashboard">
               Access the Dashboard
               <ArrowRight className="w-4 h-4 ml-2" />
@@ -224,36 +320,38 @@ const Landing = () => (
     </main>
 
     <footer className="border-t border-border bg-card">
-      <div className="container py-6 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <p className="font-display font-semibold text-foreground text-sm">Get in touch</p>
-            <p className="text-xs text-muted-foreground font-body">
-              Questions, access requests or partnership enquiries — we reply to every message.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="inline-flex items-center gap-2 text-sm font-body text-foreground hover:text-accent transition-colors"
-            >
-              <span className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                <Mail className="w-4 h-4 text-secondary-foreground" />
-              </span>
-              {CONTACT_EMAIL}
-            </a>
-            <a
-              href={LINKEDIN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-body text-foreground hover:text-accent transition-colors"
-            >
-              <span className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                <Linkedin className="w-4 h-4 text-secondary-foreground" />
-              </span>
-              LinkedIn {LINKEDIN_HANDLE}
-            </a>
-          </div>
+      <div className="container py-8 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <p className="text-sm text-muted-foreground font-body max-w-sm">
+            Built for Ministry officials, LGA secretaries, school administrators & education partners.
+          </p>
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="inline-flex items-center gap-2 text-sm font-body font-medium text-foreground hover:text-accent transition-colors"
+          >
+            <span className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+              <Mail className="w-4 h-4 text-secondary-foreground" />
+            </span>
+            {CONTACT_EMAIL}
+          </a>
+          <a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-body font-medium text-foreground hover:text-accent transition-colors"
+          >
+            <span className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+              <Linkedin className="w-4 h-4 text-secondary-foreground" />
+            </span>
+            LinkedIn {LINKEDIN_HANDLE}
+          </a>
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-1.5 text-sm font-display font-semibold text-primary hover:text-accent transition-colors"
+          >
+            Clarity for education reform
+            <ArrowUpRight className="w-4 h-4" />
+          </Link>
         </div>
         <div className="border-t border-border pt-3 space-y-1">
           <p className="text-xs text-muted-foreground font-body">{DATA_SOURCE}</p>
