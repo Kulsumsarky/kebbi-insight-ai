@@ -1,7 +1,7 @@
 import PilotBadge from "@/components/PilotBadge";
 import { useMemo, useState } from "react";
 import { Check, Info, Minus, X } from "lucide-react";
-import { coreCoverageForSchool, lgaData, reportedSchools, schoolsData, type CoreCoverageStatus } from "@/data/kebbiData";
+import { coreCoverageForSchool, dnemisTotals, lgaData, schoolsData, type CoreCoverageStatus } from "@/data/kebbiData";
 import { Button } from "@/components/ui/button";
 
 const allLGAs = lgaData.map(lga => lga.name);
@@ -43,7 +43,7 @@ const SchoolsTab = () => {
     <div className="space-y-4 animate-fade-in">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          ["Total Schools", reportedSchools, "Reported across available LGA returns", "border-l-secondary"],
+          ["Total Schools", dnemisTotals.schools, "All 21 LGAs · DNEMIS Annual School Census 2024", "border-l-secondary"],
           ["Schools with Full Core Coverage", fullCoverage, "Illustrative directory sample · Estimated", "border-l-accent"],
           ["Schools with at Least One Core Gap", withCoreGap, "Illustrative directory sample · Estimated", "border-l-destructive"],
         ].map(([title, value, note, border]) => (
