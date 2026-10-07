@@ -1,3 +1,4 @@
+import PilotBadge from "@/components/PilotBadge";
 import { useMemo, useState } from "react";
 import { Check, Info, Minus, X } from "lucide-react";
 import { coreCoverageForSchool, lgaData, reportedSchools, schoolsData, type CoreCoverageStatus } from "@/data/kebbiData";
@@ -86,7 +87,7 @@ const SchoolsTab = () => {
             </tr></thead>
             <tbody>{filtered.map((school, index) => (
               <tr key={school.name} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
-                <td className="px-4 py-3 font-semibold">{school.name}</td><td className="px-4 py-3">{school.lga}</td><td className="px-4 py-3">{school.type}</td><td className="px-4 py-3">{school.location}</td><td className="px-4 py-3">{school.students.toLocaleString()}</td><td className="px-4 py-3">{school.disabled}</td>
+                <td className="px-4 py-3 font-semibold">{school.name}</td><td className="px-4 py-3">{school.lga}<PilotBadge lga={school.lga} /></td><td className="px-4 py-3">{school.type}</td><td className="px-4 py-3">{school.location}</td><td className="px-4 py-3">{school.students.toLocaleString()}</td><td className="px-4 py-3">{school.disabled}</td>
                 <td className="px-4 py-3"><div className="flex gap-1.5 flex-wrap"><CoverageMark subject="Maths" status={school.coverage.maths} /><CoverageMark subject="English" status={school.coverage.english} /><CoverageMark subject="Science" status={school.coverage.science} /></div></td>
               </tr>
             ))}</tbody>

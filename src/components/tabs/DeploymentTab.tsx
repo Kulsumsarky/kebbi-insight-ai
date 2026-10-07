@@ -1,3 +1,4 @@
+import PilotBadge from "@/components/PilotBadge";
 import { AlertTriangle } from "lucide-react";
 import { deploymentByLga, statewideDeployment } from "@/data/kebbiData";
 import PendingBadge from "@/components/PendingBadge";
@@ -50,7 +51,7 @@ const DeploymentTab = () => (
             const status = row.classroomPercent === null ? null : statusFor(row.classroomPercent);
             return (
               <tr key={row.lga} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
-                <td className="px-4 py-3 font-semibold">{row.lga}</td>
+                <td className="px-4 py-3 font-semibold">{row.lga}<PilotBadge lga={row.lga} /></td>
                 <td className="px-4 py-3">{row.total === null ? <PendingBadge /> : row.total.toLocaleString()}</td>
                 <td className="px-4 py-3">{row.classroom === null ? <PendingBadge /> : `${row.classroom.toLocaleString()} (est.)`}</td>
                 <td className="px-4 py-3">{row.admin === null ? <PendingBadge /> : `${row.admin.toLocaleString()} (est.)`}</td>
