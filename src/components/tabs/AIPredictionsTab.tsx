@@ -1,3 +1,4 @@
+import PilotBadge from "@/components/PilotBadge";
 import { useState } from "react";
 import { AlertTriangle, Sparkles } from "lucide-react";
 import { interventions, lgaData, urgencyForGap } from "@/data/kebbiData";
@@ -33,7 +34,7 @@ const AIPredictionsTab = () => {
             const lga = lgaData.find(item => item.name === row.lga);
             return (
               <tr key={row.lga} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
-                <td className="px-4 py-3 font-semibold">{row.lga}</td>
+                <td className="px-4 py-3 font-semibold">{row.lga}<PilotBadge lga={row.lga} /></td>
                 <td className="px-4 py-3"><span className={`text-xs font-semibold px-2 py-1 rounded-full ${row.priority === "Critical" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning"}`}>{row.priority}</span></td>
                 <td className="px-4 py-3">{row.gapType}</td><td className="px-4 py-3 min-w-64">{row.action}</td>
                 <td className="px-4 py-3">{lga ? `${lga.teacherGap2024.toLocaleString()} (est.)` : "Data pending"}</td><td className="px-4 py-3">{row.impact}</td>

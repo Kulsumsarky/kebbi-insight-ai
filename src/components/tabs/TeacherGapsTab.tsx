@@ -1,3 +1,4 @@
+import PilotBadge from "@/components/PilotBadge";
 import { AlertTriangle } from "lucide-react";
 import {
   dnemisLgaData, DNEMIS_LTR_STANDARD, estimatedCoreGapsFromDnemis,
@@ -40,7 +41,7 @@ const TeacherGapsTab = () => (
             const gaps = estimatedCoreGapsFromDnemis(lga);
             return (
               <tr key={lga.lga} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
-                <td className="px-4 py-3 font-semibold">{lga.lga}</td>
+                <td className="px-4 py-3 font-semibold">{lga.lga}<PilotBadge lga={lga.lga} /></td>
                 <td className="px-4 py-3">{lga.schools.toLocaleString()}</td>
                 <td className="px-4 py-3">{lga.learners.toLocaleString()}</td>
                 <td className="px-4 py-3">{lga.teachers.toLocaleString()}</td>
