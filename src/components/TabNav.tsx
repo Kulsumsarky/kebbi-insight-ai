@@ -7,7 +7,7 @@ export const tabs = [
   "Teacher Gaps",
   "Deployment",
   "Schools",
-  "AI Recommendations",
+  "Recommendations",
 ];
 
 interface TabNavProps {

@@ -64,7 +64,7 @@ const AIPredictionsTab = () => {
       </div>
 
       <div className="bg-card rounded-md shadow-sm overflow-x-auto">
-        <h3 className="font-display font-semibold text-sm p-4 pb-2 text-card-foreground">AI Intervention Recommendations</h3>
+        <h3 className="font-display font-semibold text-sm p-4 pb-2 text-card-foreground">Intervention Recommendations</h3>
         <table className="w-full text-sm font-body">
           <thead><tr className="bg-muted text-left">
             {['LGA', 'Priority', 'Gap Type', 'Recommended Action', 'Est. Teachers Needed', 'Students Affected'].map(label => <th key={label} className="px-4 py-3 font-display font-semibold">{label}</th>)}
@@ -84,14 +84,14 @@ const AIPredictionsTab = () => {
       </div>
 
       <div className="flex flex-col items-center gap-3">
-        <Button onClick={() => setShowModal(true)} className="bg-accent text-accent-foreground hover:bg-accent/90"><Sparkles />Generate AI Report</Button>
+        <Button onClick={() => setShowModal(true)} className="bg-accent text-accent-foreground hover:bg-accent/90"><Sparkles />Download Report</Button>
         <p className="text-[10px] text-muted-foreground font-body text-center max-w-xl">Priority rankings and actions are decision-support estimates. Officials should validate school-level staffing and current DNEMIS records before deployment.</p>
       </div>
 
       {showModal && (
         <div className="fixed inset-0 bg-foreground/50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="report-title">
           <div className="bg-card rounded-md p-6 max-w-md w-full shadow-lg">
-            <h3 id="report-title" className="font-display font-bold text-lg text-card-foreground mb-3">AI Report Generation</h3>
+            <h3 id="report-title" className="font-display font-bold text-lg text-card-foreground mb-3">Download Report</h3>
             <p className="text-sm font-body text-muted-foreground mb-4">In production, this creates a Ministry briefing on urgent LGAs, core-subject shortages, deployment risks and recommended staffing actions.</p>
             <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
           </div>
