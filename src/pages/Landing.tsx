@@ -21,7 +21,7 @@ import nigeriaMap from "@/assets/nigeria-kebbi-map.png";
 import { Button } from "@/components/ui/button";
 import { DATA_SOURCE } from "@/data/kebbiData";
 
-const CONTACT_EMAIL = "edumapng.kebbi@gmail.com";
+const CONTACT_EMAIL = "hello@edumap.com.ng";
 const LINKEDIN_HANDLE = "@edumapng";
 const LINKEDIN_URL = "https://www.linkedin.com/company/edumapng";
 
