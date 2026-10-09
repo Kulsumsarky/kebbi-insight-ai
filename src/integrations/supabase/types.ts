@@ -14,6 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          name: string
+          phone: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          name: string
+          phone: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+        }
+        Relationships: []
+      }
+      officials: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          is_sample: boolean
+          lga: string
+          name: string
+          phone: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          is_sample?: boolean
+          lga: string
+          name: string
+          phone: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          is_sample?: boolean
+          lga?: string
+          name?: string
+          phone?: string
+        }
+        Relationships: []
+      }
+      pending_updates: {
+        Row: {
+          classroom_teachers: number
+          created_at: string
+          id: string
+          learners: number
+          lga: string
+          office_teachers: number
+          official_id: string
+          school: string
+          status: string
+          subject_gaps: string[]
+          total_teachers: number
+        }
+        Insert: {
+          classroom_teachers: number
+          created_at?: string
+          id?: string
+          learners: number
+          lga: string
+          office_teachers?: number
+          official_id: string
+          school: string
+          status?: string
+          subject_gaps?: string[]
+          total_teachers: number
+        }
+        Update: {
+          classroom_teachers?: number
+          created_at?: string
+          id?: string
+          learners?: number
+          lga?: string
+          office_teachers?: number
+          official_id?: string
+          school?: string
+          status?: string
+          subject_gaps?: string[]
+          total_teachers?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_updates_official_id_fkey"
+            columns: ["official_id"]
+            isOneToOne: false
+            referencedRelation: "officials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -38,6 +142,30 @@ export type Database = {
           id?: string
           lga?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      schools: {
+        Row: {
+          created_at: string
+          id: string
+          is_sample: boolean
+          lga: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_sample?: boolean
+          lga: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_sample?: boolean
+          lga?: string
+          name?: string
         }
         Relationships: []
       }
@@ -73,6 +201,32 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      official_schools: {
+        Args: { _phone: string }
+        Returns: {
+          name: string
+        }[]
+      }
+      submit_pending_update: {
+        Args: {
+          _classroom: number
+          _gaps: string[]
+          _learners: number
+          _office: number
+          _phone: string
+          _school: string
+          _total: number
+        }
+        Returns: string
+      }
+      verify_official: {
+        Args: { _phone: string }
+        Returns: {
+          id: string
+          lga: string
+          name: string
+        }[]
       }
     }
     Enums: {
