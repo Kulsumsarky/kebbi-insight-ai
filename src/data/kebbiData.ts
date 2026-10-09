@@ -219,42 +219,23 @@ export interface DeploymentEstimate {
   classroomPercent: number | null;
 }
 
-export function estimateDeployment(lga: LGAData): DeploymentEstimate {
-  if (lga.teachers === null) {
-    return { lga: lga.name, total: null, classroom: null, admin: null, unverified: null, classroomPercent: null };
-  }
-
-  const severity = shortageSeverity(lga) ?? 0;
-  const adminRate = 0.08 + ((lga.name.length % 5) * 0.01);
-  const unverifiedRate = 0.04 + (severity >= 20 ? 0.04 : severity >= 10 ? 0.02 : 0);
-  const admin = Math.round(lga.teachers * adminRate);
-  const unverified = Math.round(lga.teachers * unverifiedRate);
-  const classroom = lga.teachers - admin - unverified;
-  return {
-    lga: lga.name,
-    total: lga.teachers,
-    classroom,
-    admin,
-    unverified,
-    classroomPercent: Math.round((classroom / lga.teachers) * 100),
-  };
+export function estimateDeployment(row: DnemisLgaData): DeploymentEstimate {
+  const adminRate = 0.08 + ((row.lga.length % 5) * 0.01);
+  const unverifiedRate = row.urgency === "Critical" ? 0.08 : row.urgency === "High" ? 0.06 : 0.04;
+  const admin = Math.round(row.teachers * adminRate);
+  const unverified = Math.round(row.teachers * unverifiedRate);
+  const classroom = row.teachers - admin - unverified;
+  return { lga: row.lga, total: row.teachers, classroom, admin, unverified, classroomPercent: Math.round((classroom / row.teachers) * 100) };
 }
 
-export const deploymentByLga = lgaData.map(estimateDeployment);
-const reportedDeployment = deploymentByLga.filter((row): row is DeploymentEstimate & {
-  total: number; classroom: number; admin: number; unverified: number; classroomPercent: number;
-} => row.total !== null && row.classroom !== null && row.admin !== null && row.unverified !== null && row.classroomPercent !== null);
-const reportedDeploymentTotal = reportedDeployment.reduce((sum, row) => sum + row.total, 0);
-const weightedRate = (field: "classroom" | "admin" | "unverified") =>
-  reportedDeploymentTotal === 0 ? 0 : reportedDeployment.reduce((sum, row) => sum + row[field], 0) / reportedDeploymentTotal;
-
-const statewideClassroom = Math.round(statewide.teachers * weightedRate("classroom"));
-const statewideAdmin = Math.round(statewide.teachers * weightedRate("admin"));
+/** Deployment split is estimated; LGA totals are DNEMIS census teachers. */
+export const deploymentByLga = dnemisLgaData.map(estimateDeployment);
+const sumField = (f: "total" | "classroom" | "admin" | "unverified") => deploymentByLga.reduce((sum, r) => sum + (r[f] ?? 0), 0);
 export const statewideDeployment = {
-  total: statewide.teachers,
-  classroom: statewideClassroom,
-  admin: statewideAdmin,
-  unverified: statewide.teachers - statewideClassroom - statewideAdmin,
+  total: sumField("total"),
+  classroom: sumField("classroom"),
+  admin: sumField("admin"),
+  unverified: sumField("unverified"),
 };
 
 export type CoreCoverageStatus = "qualified" | "missing" | "unverified";
