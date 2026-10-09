@@ -1,11 +1,21 @@
 import PilotBadge from "@/components/PilotBadge";
 import { useState } from "react";
 import { AlertTriangle, Sparkles } from "lucide-react";
-import { interventions, lgaData, urgencyForGap, dnemisLgaData, estimatedCoreGapsFromDnemis } from "@/data/kebbiData";
+import { dnemisLgaData, estimatedCoreGapsFromDnemis, DNEMIS_LTR_STANDARD } from "@/data/kebbiData";
 import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const criticalLgas = lgaData.filter(lga => urgencyForGap(lga.teacherGap2024) === "Critical");
+const criticalLgas = dnemisLgaData.filter(row => row.urgency === "Critical");
+const aggregateGap = (r: (typeof dnemisLgaData)[number]) => { const g = estimatedCoreGapsFromDnemis(r); return g.maths + g.english + g.science; };
+const actionFor = (r: (typeof dnemisLgaData)[number]) => {
+  if (r.femaleTeachersPct < 25) return "Prioritise recruitment with targeted female teacher intake to support girls' enrolment";
+  if (r.urgency === "Critical") return "Emergency recruitment and rural posting incentives for core subjects";
+  return "Rebalance postings from over-served schools and recruit for Maths, English and Science";
+};
+const interventions = dnemisLgaData
+  .filter(r => r.urgency === "Critical" || r.urgency === "High")
+  .sort((a, b) => b.ltr - a.ltr)
+  .map(r => ({ row: r, gap: aggregateGap(r) }));
 
 const subjectTotals = dnemisLgaData.reduce(
   (acc, row) => { const g = estimatedCoreGapsFromDnemis(row); acc.Mathematics += g.maths; acc.English += g.english; acc.Science += g.science; return acc; },
@@ -41,7 +51,7 @@ const AIPredictionsTab = () => {
       <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-destructive max-w-sm">
         <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Highest Urgency LGAs</p>
         <p className="text-3xl font-display font-bold text-destructive mt-1">{criticalLgas.length}</p>
-        <p className="text-xs text-muted-foreground font-body mt-1">Critical-rated LGAs with a gap of 400 or more teachers</p>
+        <p className="text-xs text-muted-foreground font-body mt-1">LGAs rated Critical in the DNEMIS 2024 census</p>
       </div>
 
       <div className="bg-card rounded-md shadow-sm overflow-x-auto">
@@ -69,17 +79,16 @@ const AIPredictionsTab = () => {
           <thead><tr className="bg-muted text-left">
             {['LGA', 'Priority', 'Gap Type', 'Recommended Action', 'Est. Teachers Needed', 'Students Affected'].map(label => <th key={label} className="px-4 py-3 font-display font-semibold">{label}</th>)}
           </tr></thead>
-          <tbody>{interventions.map((row, index) => {
-            const lga = lgaData.find(item => item.name === row.lga);
-            return (
+          <tbody>{interventions.map(({ row, gap }, index) => (
               <tr key={row.lga} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
                 <td className="px-4 py-3 font-semibold">{row.lga}<PilotBadge lga={row.lga} /></td>
-                <td className="px-4 py-3"><span className={`text-xs font-semibold px-2 py-1 rounded-full ${row.priority === "Critical" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning"}`}>{row.priority}</span></td>
-                <td className="px-4 py-3">{row.gapType}</td><td className="px-4 py-3 min-w-64">{row.action}</td>
-                <td className="px-4 py-3">{lga ? `${lga.teacherGap2024.toLocaleString()} (est.)` : "Data pending"}</td><td className="px-4 py-3">{row.impact}</td>
+                <td className="px-4 py-3"><span className={`text-xs font-semibold px-2 py-1 rounded-full ${row.urgency === "Critical" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning"}`}>{row.urgency}</span></td>
+                <td className="px-4 py-3">Learner-teacher ratio 1:{Math.round(row.ltr)} vs 1:{DNEMIS_LTR_STANDARD} standard; {row.femaleTeachersPct}% female teachers</td>
+                <td className="px-4 py-3 min-w-64">{actionFor(row)}</td>
+                <td className="px-4 py-3">{gap.toLocaleString()} (est.)</td>
+                <td className="px-4 py-3">{row.learners.toLocaleString()} learners</td>
               </tr>
-            );
-          })}</tbody>
+            ))}</tbody>
         </table>
       </div>
 

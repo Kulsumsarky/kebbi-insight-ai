@@ -1,10 +1,10 @@
 import PilotBadge from "@/components/PilotBadge";
 import { useMemo, useState } from "react";
 import { Check, Info, Minus, X } from "lucide-react";
-import { coreCoverageForSchool, dnemisTotals, lgaData, schoolsData, type CoreCoverageStatus } from "@/data/kebbiData";
+import { coreCoverageForSchool, dnemisLgaData, dnemisTotals, schoolsData, type CoreCoverageStatus } from "@/data/kebbiData";
 import { Button } from "@/components/ui/button";
 
-const allLGAs = lgaData.map(lga => lga.name);
+const allLGAs = dnemisLgaData.map(r => r.lga).sort();
 
 const CoverageMark = ({ subject, status }: { subject: string; status: CoreCoverageStatus }) => {
   const settings = {
