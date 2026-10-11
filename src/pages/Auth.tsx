@@ -70,7 +70,7 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        toast.success("Account created. You are signed in.");
+        toast.success("Account created. Access must be approved before you can view the dashboard.");
         navigate("/dashboard", { replace: true });
       } else {
         const { error } = await supabase.auth.signInWithPassword({

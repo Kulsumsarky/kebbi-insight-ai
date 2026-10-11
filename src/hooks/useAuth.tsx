@@ -23,6 +23,7 @@ interface AuthContextValue {
   profile: Profile | null;
   role: AppRole | null;
   loading: boolean;
+  roleLoading: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -32,6 +33,7 @@ const AuthContext = createContext<AuthContextValue>({
   profile: null,
   role: null,
   loading: true,
+  roleLoading: true,
   signOut: async () => {},
 });
 
@@ -41,6 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(true);
 
   useEffect(() => {
     const loadDetails = (uid: string) => {
@@ -51,6 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         ]);
         setProfile((p as Profile) ?? null);
         setRole((r?.role as AppRole) ?? null);
+        setRoleLoading(false);
       }, 0);
     };
 
@@ -59,10 +63,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(newSession?.user ?? null);
       setLoading(false);
       if (newSession?.user) {
+        setRoleLoading(true);
         loadDetails(newSession.user.id);
       } else {
         setProfile(null);
         setRole(null);
+        setRoleLoading(false);
       }
     });
 
@@ -71,6 +77,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(existing?.user ?? null);
       setLoading(false);
       if (existing?.user) loadDetails(existing.user.id);
+      else setRoleLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -85,7 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, role, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, profile, role, loading, roleLoading, signOut }}>
       {children}
     </AuthContext.Provider>
   );

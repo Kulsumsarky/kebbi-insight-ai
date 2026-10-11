@@ -4,6 +4,7 @@ import { Download, Loader2, Check, X, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type Update = {
   id: string;
@@ -36,13 +37,18 @@ const downloadCsv = (filename: string, header: string[], rows: unknown[][]) => {
 const fmt = (d: string) => new Date(d).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
 
 const Admin = () => {
-  const { role, loading: authLoading, signOut } = useAuth();
+  const { user, role, loading: authLoading, signOut } = useAuth();
   const [tab, setTab] = useState<"pending" | "reviewed" | "contacts">("pending");
   const [updates, setUpdates] = useState<Update[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [waited, setWaited] = useState(false);
+  const [verified, setVerified] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [gateBusy, setGateBusy] = useState(false);
+  const [gateError, setGateError] = useState("");
 
   useEffect(() => {
     const t = setTimeout(() => setWaited(true), 2000);
@@ -66,8 +72,8 @@ const Admin = () => {
   }, []);
 
   useEffect(() => {
-    if (role === "ministry") load();
-  }, [role, load]);
+    if (role === "ministry" && verified) load();
+  }, [role, verified, load]);
 
   const review = async (id: string, status: "approved" | "rejected") => {
     const { error: e } = await supabase.from("pending_updates").update({ status }).eq("id", id);
@@ -100,6 +106,40 @@ const Admin = () => {
         <Button asChild className="bg-primary text-primary-foreground">
           <Link to="/auth">Sign in</Link>
         </Button>
+      </div>
+    );
+  }
+
+  const confirmIdentity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setGateBusy(true);
+    setGateError("");
+    const { data, error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    setGateBusy(false);
+    if (err || !data.user) return setGateError("Incorrect email or password.");
+    if (data.user.id !== user?.id) {
+      await supabase.auth.signOut();
+      return setGateError("That is not the signed-in admin account.");
+    }
+    setPassword("");
+    setVerified(true);
+  };
+
+  if (!verified) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-6">
+        <form onSubmit={confirmIdentity} className="w-full max-w-sm space-y-3">
+          <h1 className="font-display font-bold text-2xl text-foreground">Confirm admin sign-in</h1>
+          <p className="text-sm text-muted-foreground font-body">
+            Enter the email and password of your approved admin account to continue.
+          </p>
+          <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          {gateError && <p className="text-sm text-destructive font-body">{gateError}</p>}
+          <Button type="submit" disabled={gateBusy} className="w-full bg-primary text-primary-foreground">
+            {gateBusy ? "Checking..." : "Continue"}
+          </Button>
+        </form>
       </div>
     );
   }
