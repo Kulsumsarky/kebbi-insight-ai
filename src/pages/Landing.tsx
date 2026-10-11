@@ -23,8 +23,8 @@ import { DATA_SOURCE } from "@/data/kebbiData";
 import ChatWidget from "@/components/ChatWidget";
 
 const CONTACT_EMAIL = "hello@edumap.com.ng";
-const LINKEDIN_HANDLE = "@edumapng";
-const LINKEDIN_URL = "https://www.linkedin.com/company/edumapng";
+const LINKEDIN_HANDLE = "@edumap";
+const LINKEDIN_URL = "https://www.linkedin.com/company/edumap";
 
 const problemPoints = [
   { icon: MapPin, title: "Where teachers are actually deployed" },
@@ -40,7 +40,7 @@ const faqs = [
   { q: "Who can see it?", a: "Only authorised officials. Data is handled with the consent of the relevant authorities." },
   { q: "Is it free during the pilot?", a: "Please write to us and we will share the pilot details with your office." },
   { q: "How do LGEAs take part?", a: "We begin with five pilot LGAs and work with their education authorities to collect and verify school-level data." },
-  { q: "How do I contact you?", a: "Email hello@edumap.com.ng or message us on LinkedIn at @edumapng." },
+  { q: "How do I contact you?", a: "Email hello@edumap.com.ng or message us on LinkedIn at @edumap." },
 ];
 
 const whatItDoes = [
