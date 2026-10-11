@@ -93,9 +93,9 @@ const Admin = () => {
   if (role !== "ministry") {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3 bg-background px-6 text-center">
-        <h1 className="font-display font-bold text-2xl text-foreground">Ministry access only</h1>
+        <h1 className="font-display font-bold text-2xl text-foreground">Admin access only</h1>
         <p className="text-muted-foreground font-body max-w-md">
-          This page is for State Ministry accounts. Please sign in with a Ministry account.
+          This page is for administrators. Please sign in with an admin account.
         </p>
         <Button asChild className="bg-primary text-primary-foreground">
           <Link to="/auth">Sign in</Link>
