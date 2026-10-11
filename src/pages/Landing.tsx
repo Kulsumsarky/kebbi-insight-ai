@@ -20,6 +20,7 @@ import kebbiSeal from "@/assets/kebbi-seal.jpg";
 import nigeriaMap from "@/assets/nigeria-kebbi-map.png";
 import { Button } from "@/components/ui/button";
 import { DATA_SOURCE } from "@/data/kebbiData";
+import ChatWidget from "@/components/ChatWidget";
 
 const CONTACT_EMAIL = "hello@edumap.com.ng";
 const LINKEDIN_HANDLE = "@edumapng";
@@ -454,6 +455,7 @@ const Landing = () => (
         </div>
       </div>
     </footer>
+    <ChatWidget />
   </div>
 );
 
