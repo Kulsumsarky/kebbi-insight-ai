@@ -361,19 +361,7 @@ const Landing = () => (
 
       {/* Trust */}
       <section className="container py-12 md:py-16">
-        <div className="grid gap-6 md:grid-cols-3">
-          {[
-            "Built on DNEMIS data",
-            "Part of iDICE Founders Lab Cohort 2",
-            "Based in Birnin Kebbi",
-          ].map((t) => (
-            <div key={t} className="flex items-center gap-3">
-              <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
-              <p className="font-display font-semibold text-foreground">{t}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-6 text-sm text-muted-foreground font-body max-w-2xl">
+        <p className="text-sm text-muted-foreground font-body max-w-2xl">
           Data is handled with the consent of the relevant authorities and shared only with authorised officials.
         </p>
       </section>
