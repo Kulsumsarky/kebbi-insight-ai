@@ -20,10 +20,28 @@ import kebbiSeal from "@/assets/kebbi-seal.jpg";
 import nigeriaMap from "@/assets/nigeria-kebbi-map.png";
 import { Button } from "@/components/ui/button";
 import { DATA_SOURCE } from "@/data/kebbiData";
+import ChatWidget from "@/components/ChatWidget";
 
 const CONTACT_EMAIL = "hello@edumap.com.ng";
 const LINKEDIN_HANDLE = "@edumapng";
 const LINKEDIN_URL = "https://www.linkedin.com/company/edumapng";
+
+const problemPoints = [
+  { icon: MapPin, title: "Where teachers are actually deployed" },
+  { icon: BarChart3, title: "Which subjects are short, LGA by LGA" },
+  { icon: CheckCircle2, title: "Current evidence, not months-old estimates" },
+];
+
+const pilotLgas = ["Birnin Kebbi", "Kalgo", "Argungu", "Gwandu", "Aliero"];
+
+const faqs = [
+  { q: "What is EduMap NG?", a: "A platform that turns school-level teacher data into clear evidence for planning and posting decisions in Kebbi State." },
+  { q: "Where does the data come from?", a: "It is built on DNEMIS data, and school-level records collected with local government education authorities." },
+  { q: "Who can see it?", a: "Only authorised officials. Data is handled with the consent of the relevant authorities." },
+  { q: "Is it free during the pilot?", a: "Please write to us and we will share the pilot details with your office." },
+  { q: "How do LGEAs take part?", a: "We begin with five pilot LGAs and work with their education authorities to collect and verify school-level data." },
+  { q: "How do I contact you?", a: "Email hello@edumap.com.ng or message us on LinkedIn at @edumapng." },
+];
 
 const whatItDoes = [
   {
@@ -77,7 +95,7 @@ const howItWorks = [
 const whoFor = [
   {
     icon: Building2,
-    title: "State Ministry & SUBEB",
+    title: "State Ministry",
     text: "Set recruitment priorities, track progress against targets, and brief partners with one authoritative view.",
   },
   {
@@ -190,10 +208,15 @@ const Landing = () => (
             EduMap <span className="text-primary">NG</span>
           </span>
         </div>
-        <p className="hidden sm:flex items-center gap-2 text-[11px] font-body font-semibold uppercase tracking-widest text-muted-foreground">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-          Introducing EduMap NG
-        </p>
+        <nav className="hidden md:flex items-center gap-6 text-sm font-body font-medium text-muted-foreground">
+          <a href="#problem" className="hover:text-foreground transition-colors">Problem</a>
+          <a href="#how-it-works" className="hover:text-foreground transition-colors">How it works</a>
+          <a href="#pilot" className="hover:text-foreground transition-colors">Pilot</a>
+          <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+        </nav>
+        <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-display font-semibold">
+          <a href={`mailto:${CONTACT_EMAIL}?subject=Request%20a%20briefing`}>Request a briefing</a>
+        </Button>
       </div>
     </header>
 
@@ -206,22 +229,22 @@ const Landing = () => (
               Teacher Deployment & Gap Intelligence
             </p>
             <h2 className="font-display font-bold text-4xl md:text-5xl xl:text-6xl leading-[1.05] tracking-tight text-foreground mb-5">
-              Kebbi's education gaps,{" "}
-              <span className="text-primary">mapped.</span>
+              See where every teacher is needed,{" "}
+              <span className="text-primary">LGA by LGA.</span>
             </h2>
             <p className="text-muted-foreground font-body text-base md:text-lg max-w-lg mb-5">
-              EduMap NG gives Ministry officials, LGA secretaries and school administrators a shared,
-              evidence-based view of teacher deployment, resource gaps and staffing capacity across all 21 LGAs.
+              EduMap NG turns school-level teacher data into clear, current evidence for planning and
+              posting decisions in Kebbi State.
             </p>
             <p className="font-display font-semibold text-foreground text-sm mb-6">
               Map gaps. Align action. Strengthen schools.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-display font-semibold group">
-                <Link to="/dashboard">
-                  Explore dashboard
+                <a href={`mailto:${CONTACT_EMAIL}?subject=Request%20a%20briefing`}>
+                  Request a briefing
                   <ArrowUpRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </Link>
+                </a>
               </Button>
               <Button
                 asChild
@@ -229,19 +252,38 @@ const Landing = () => (
                 variant="outline"
                 className="bg-transparent border-primary/40 text-primary hover:bg-secondary hover:text-primary font-display font-semibold"
               >
-                <Link to="/auth">Sign in / Register</Link>
+                <a href="#how-it-works">See how it works</a>
               </Button>
             </div>
             <p className="mt-3.5 text-xs text-muted-foreground font-body">
-              Sign-in required to view records and explore the dashboard.
+              Officials with an account can <Link to="/auth" className="underline underline-offset-2">sign in here</Link>.
             </p>
           </div>
           <HeroIllustration />
         </div>
       </section>
 
+      {/* Problem */}
+      <section id="problem" className="container py-12 md:py-16 scroll-mt-20">
+        <p className="text-[11px] font-body font-semibold uppercase tracking-widest text-primary mb-2">The problem</p>
+        <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-3">
+          Teacher gaps are hard to see without current school-level data
+        </h2>
+        <p className="text-muted-foreground font-body max-w-2xl mb-8">
+          Planning and posting decisions are only as good as the evidence behind them. EduMap NG brings it into one place.
+        </p>
+        <div className="grid gap-6 md:grid-cols-3">
+          {problemPoints.map(({ icon: Icon, title }) => (
+            <div key={title} className="flex items-start gap-3">
+              <Icon className="w-6 h-6 text-primary shrink-0" />
+              <p className="font-display font-semibold text-foreground">{title}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* What EduMap does */}
-      <section className="container py-12 md:py-16">
+      <section id="how-it-works" className="container py-12 md:py-16 scroll-mt-20">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {whatItDoes.map(({ icon: Icon, title, text }) => (
             <div key={title} className="group">
@@ -300,20 +342,72 @@ const Landing = () => (
         </div>
       </section>
 
+      {/* Pilot */}
+      <section id="pilot" className="bg-secondary scroll-mt-20">
+        <div className="container py-12 md:py-16">
+          <p className="text-[11px] font-body font-semibold uppercase tracking-widest text-primary mb-2">Pilot</p>
+          <h2 className="font-display font-bold text-2xl md:text-3xl text-secondary-foreground mb-5">
+            Starting in 5 LGAs
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {pilotLgas.map((l) => (
+              <span key={l} className="bg-card border border-border rounded-full px-4 py-1.5 text-sm font-display font-semibold text-foreground">
+                {l}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust */}
+      <section className="container py-12 md:py-16">
+        <div className="grid gap-6 md:grid-cols-3">
+          {[
+            "Built on DNEMIS data",
+            "Part of iDICE Founders Lab Cohort 2",
+            "Based in Birnin Kebbi",
+          ].map((t) => (
+            <div key={t} className="flex items-center gap-3">
+              <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+              <p className="font-display font-semibold text-foreground">{t}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-6 text-sm text-muted-foreground font-body max-w-2xl">
+          Data is handled with the consent of the relevant authorities and shared only with authorised officials.
+        </p>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="container pb-12 md:pb-16 scroll-mt-20">
+        <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-6">Frequently asked questions</h2>
+        <div className="divide-y divide-border border-y border-border max-w-3xl">
+          {faqs.map(({ q, a }) => (
+            <details key={q} className="group py-4">
+              <summary className="cursor-pointer list-none font-display font-semibold text-foreground flex justify-between items-center">
+                {q}
+                <span className="text-primary transition-transform group-open:rotate-45 text-xl leading-none">+</span>
+              </summary>
+              <p className="mt-2 text-sm text-muted-foreground font-body">{a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
       {/* Closing CTA */}
       <section className="container py-12 md:py-16">
         <div className="rounded-2xl bg-primary text-primary-foreground px-6 py-10 md:px-12 md:py-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <h2 className="font-display font-bold text-2xl md:text-3xl mb-2">Ready to see your LGA?</h2>
+            <h2 className="font-display font-bold text-2xl md:text-3xl mb-2">Want a short briefing for your office?</h2>
             <p className="text-primary-foreground/85 font-body max-w-xl">
-              Access is restricted to authorised officials. Sign in with your account, or register to request access.
+              Write to us at {CONTACT_EMAIL} or find us on LinkedIn {LINKEDIN_HANDLE}.
             </p>
           </div>
           <Button asChild size="lg" className="bg-accent text-primary hover:bg-accent/90 font-display font-semibold shrink-0">
-            <Link to="/dashboard">
-              Access the Dashboard
+            <a href={`mailto:${CONTACT_EMAIL}?subject=Request%20a%20briefing`}>
+              Request a briefing
               <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
+            </a>
           </Button>
         </div>
       </section>
@@ -323,7 +417,7 @@ const Landing = () => (
       <div className="container py-8 space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
           <p className="text-sm text-muted-foreground font-body max-w-sm">
-            Built for Ministry officials, LGA secretaries, school administrators & education partners.
+            Built for education officials, LGA secretaries, school administrators & partners in Kebbi State.
           </p>
           <a
             href={`mailto:${CONTACT_EMAIL}`}
@@ -361,6 +455,7 @@ const Landing = () => (
         </div>
       </div>
     </footer>
+    <ChatWidget />
   </div>
 );
 

@@ -68,3 +68,5 @@
     @apply font-display;
   }
 }
+
+html { scroll-behavior: smooth; }
