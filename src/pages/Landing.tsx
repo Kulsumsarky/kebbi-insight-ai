@@ -38,8 +38,9 @@ const faqs = [
   { q: "What is EduMap NG?", a: "A platform that turns school-level teacher data into clear evidence for planning and posting decisions in Kebbi State." },
   { q: "Where does the data come from?", a: "It is built on DNEMIS data, and school-level records collected with local government education authorities." },
   { q: "Who can see it?", a: "Only authorised officials. Data is handled with the consent of the relevant authorities." },
-  { q: "Is it free during the pilot?", a: "Please write to us and we will share the pilot details with your office." },
+  { q: "Is it free during the pilot?", a: "We will confirm pilot terms with your office during a short briefing. Write to us to arrange one." },
   { q: "How do LGEAs take part?", a: "We begin with five pilot LGAs and work with their education authorities to collect and verify school-level data." },
+  { q: "Is our data safe?", a: "Data is held securely and shared only with authorised officials, with the consent of the relevant authorities." },
   { q: "How do I contact you?", a: "Email hello@edumap.com.ng or message us on LinkedIn at @edumap." },
 ];
 
@@ -47,7 +48,7 @@ const whatItDoes = [
   {
     icon: School,
     title: "Maps every LGA in one view",
-    text: "Schools, learners and teachers for all 21 local government areas in a single, consistent picture.",
+    text: "State-level figures for all 21 LGAs, with school-level detail growing as the pilot expands.",
   },
   {
     icon: BarChart3,
@@ -61,13 +62,13 @@ const whatItDoes = [
   },
   {
     icon: Target,
-    title: "Ranks what to act on first",
+    title: "Shows where to act first",
     text: "A priority-ordered list of recommended actions, so limited recruitment capacity goes where the need is greatest.",
   },
   {
     icon: Sparkles,
-    title: "Writes the brief for you",
-    text: "Generates a structured intelligence report, ready to circulate to the Ministry, LGA secretaries and partners.",
+    title: "Ready-to-share summaries",
+    text: "Clear written summaries you can circulate to the Ministry, LGA secretaries and partners.",
   },
 ];
 
@@ -75,8 +76,8 @@ const howItWorks = [
   {
     step: "1",
     icon: ClipboardList,
-    title: "Load the official records",
-    text: "Verified census and ministry data is imported once and held centrally, so every user sees the same numbers.",
+    title: "Collect and verify",
+    text: "We work with local education authorities to gather school-level teacher data, checked against official records.",
   },
   {
     step: "2",
@@ -88,7 +89,7 @@ const howItWorks = [
     step: "3",
     icon: CheckCircle2,
     title: "Decide and act",
-    text: "Leave with a defensible shortlist of where to post, recruit or intervene — and a written report to back it.",
+    text: "Leave with a defensible shortlist of where to post, recruit or intervene, with a written summary to back it.",
   },
 ];
 
@@ -284,6 +285,7 @@ const Landing = () => (
 
       {/* What EduMap does */}
       <section id="how-it-works" className="container py-12 md:py-16 scroll-mt-20">
+        <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-8">What EduMap NG does</h2>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {whatItDoes.map(({ icon: Icon, title, text }) => (
             <div key={title} className="group">
@@ -349,6 +351,9 @@ const Landing = () => (
           <h2 className="font-display font-bold text-2xl md:text-3xl text-secondary-foreground mb-5">
             Starting in 5 LGAs
           </h2>
+          <p className="text-secondary-foreground/80 font-body max-w-2xl mb-5">
+            In these LGAs we work with education authorities to collect and verify school-level data, so officials see current figures for their own area.
+          </p>
           <div className="flex flex-wrap gap-2">
             {pilotLgas.map((l) => (
               <span key={l} className="bg-card border border-border rounded-full px-4 py-1.5 text-sm font-display font-semibold text-foreground">
@@ -388,7 +393,7 @@ const Landing = () => (
           <div>
             <h2 className="font-display font-bold text-2xl md:text-3xl mb-2">Want a short briefing for your office?</h2>
             <p className="text-primary-foreground/85 font-body max-w-xl">
-              Write to us at {CONTACT_EMAIL} or find us on LinkedIn {LINKEDIN_HANDLE}.
+              Write to us at {CONTACT_EMAIL}, use the chat button at the bottom right, or find us on LinkedIn {LINKEDIN_HANDLE}.
             </p>
           </div>
           <Button asChild size="lg" className="bg-accent text-primary hover:bg-accent/90 font-display font-semibold shrink-0">
@@ -427,18 +432,11 @@ const Landing = () => (
             </span>
             LinkedIn {LINKEDIN_HANDLE}
           </a>
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-1.5 text-sm font-display font-semibold text-primary hover:text-accent transition-colors"
-          >
-            Clarity for education reform
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
         </div>
         <div className="border-t border-border pt-3 space-y-1">
           <p className="text-xs text-muted-foreground font-body">{DATA_SOURCE}</p>
           <p className="text-xs text-muted-foreground font-body">
-            Access to the dashboard is restricted to authorised officials. Sign in or request an account to continue.
+            Access to the dashboard is restricted to authorised officials. To request an account, email {CONTACT_EMAIL}.
           </p>
         </div>
       </div>
