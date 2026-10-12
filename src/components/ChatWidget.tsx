@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MessageCircle, X, ArrowLeft, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
+const CONTACT_EMAIL = "hello@edumap.com.ng";
 
 type View = "menu" | "faq" | "contact" | "official" | "update" | "done";
 
@@ -37,6 +39,17 @@ const ChatWidget = () => {
   const [learners, setLearners] = useState("");
   const [gaps, setGaps] = useState("");
 
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const target = (e as CustomEvent<View>).detail;
+      setOpen(true);
+      setError("");
+      setView(target ?? "menu");
+    };
+    window.addEventListener("edumap:open-chat", onOpen);
+    return () => window.removeEventListener("edumap:open-chat", onOpen);
+  }, []);
+
   const goto = (v: View) => {
     setError("");
     setView(v);
@@ -45,11 +58,27 @@ const ChatWidget = () => {
   const sendContact = async () => {
     if (!cName.trim() || !cPhone.trim() || !cMsg.trim()) return setError("Please fill in all fields.");
     setBusy(true);
-    const { error: e } = await supabase
-      .from("contact_requests")
-      .insert({ name: cName.trim(), phone: cPhone.trim(), message: cMsg.trim() });
+    const payload = { name: cName.trim(), phone: cPhone.trim(), message: cMsg.trim() };
+    // Save to the database (shown on the admin page) and email hello@edumap.com.ng at the same time.
+    const [saved, emailed] = await Promise.allSettled([
+      supabase.from("contact_requests").insert(payload),
+      fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          ...payload,
+          _subject: "EduMap NG: new briefing request",
+          _template: "table",
+          _captcha: "false",
+        }),
+      }).then((r) => {
+        if (!r.ok) throw new Error("email failed");
+      }),
+    ]);
     setBusy(false);
-    if (e) return setError("Sorry, that did not send. Please email hello@edumap.com.ng.");
+    const dbOk = saved.status === "fulfilled" && !saved.value.error;
+    const mailOk = emailed.status === "fulfilled";
+    if (!dbOk && !mailOk) return setError("Sorry, that did not send. Please email hello@edumap.com.ng.");
     setDoneMsg("Thank you. We have received your message and will be in touch.");
     setCName(""); setCPhone(""); setCMsg("");
     goto("done");
