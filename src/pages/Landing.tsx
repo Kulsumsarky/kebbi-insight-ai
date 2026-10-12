@@ -26,6 +26,9 @@ const CONTACT_EMAIL = "hello@edumap.com.ng";
 const LINKEDIN_HANDLE = "@edumap";
 const LINKEDIN_URL = "https://www.linkedin.com/company/edumap";
 
+// Opens the chat panel on the contact form, so the request is saved and appears on the admin page.
+const openBriefing = () => window.dispatchEvent(new CustomEvent("edumap:open-chat", { detail: "contact" }));
+
 const problemPoints = [
   { icon: MapPin, title: "Where teachers are actually deployed" },
   { icon: BarChart3, title: "Which subjects are short, LGA by LGA" },
@@ -215,8 +218,8 @@ const Landing = () => (
           <a href="#pilot" className="hover:text-foreground transition-colors">Pilot</a>
           <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
         </nav>
-        <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-display font-semibold">
-          <a href={`mailto:${CONTACT_EMAIL}?subject=Request%20a%20briefing`}>Request a briefing</a>
+        <Button size="sm" onClick={openBriefing} className="bg-primary text-primary-foreground hover:bg-primary/90 font-display font-semibold">
+          Request a briefing
         </Button>
       </div>
     </header>
@@ -241,11 +244,9 @@ const Landing = () => (
               Map gaps. Align action. Strengthen schools.
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-display font-semibold group">
-                <a href={`mailto:${CONTACT_EMAIL}?subject=Request%20a%20briefing`}>
-                  Request a briefing
-                  <ArrowUpRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </a>
+              <Button size="lg" onClick={openBriefing} className="bg-primary text-primary-foreground hover:bg-primary/90 font-display font-semibold group">
+                Request a briefing
+                <ArrowUpRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Button>
               <Button
                 asChild
@@ -396,11 +397,9 @@ const Landing = () => (
               Write to us at {CONTACT_EMAIL}, use the chat button at the bottom right, or find us on LinkedIn {LINKEDIN_HANDLE}.
             </p>
           </div>
-          <Button asChild size="lg" className="bg-accent text-primary hover:bg-accent/90 font-display font-semibold shrink-0">
-            <a href={`mailto:${CONTACT_EMAIL}?subject=Request%20a%20briefing`}>
-              Request a briefing
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </a>
+          <Button size="lg" onClick={openBriefing} className="bg-accent text-primary hover:bg-accent/90 font-display font-semibold shrink-0">
+            Request a briefing
+            <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </section>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MessageCircle, X, ArrowLeft, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,17 @@ const ChatWidget = () => {
   const [office, setOffice] = useState("0");
   const [learners, setLearners] = useState("");
   const [gaps, setGaps] = useState("");
+
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const target = (e as CustomEvent<View>).detail;
+      setOpen(true);
+      setError("");
+      setView(target ?? "menu");
+    };
+    window.addEventListener("edumap:open-chat", onOpen);
+    return () => window.removeEventListener("edumap:open-chat", onOpen);
+  }, []);
 
   const goto = (v: View) => {
     setError("");
