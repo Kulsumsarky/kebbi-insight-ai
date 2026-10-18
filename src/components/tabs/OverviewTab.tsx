@@ -5,6 +5,7 @@ import {
 } from "@/data/kebbiData";
 import { ChevronDown, ChevronUp, Scale } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
+import CriticalLgaCards from "@/components/CriticalLgaCards";
 
 const gapColour = (urgency: string) => {
   if (urgency === "Critical") return "hsl(var(--destructive))";
@@ -37,6 +38,8 @@ const OverviewTab = () => {
         <MetricCard title="Subject Gaps Identified" value={dnemisTotals.subjectGaps} note="Estimated Maths, English and Science shortfalls" border="border-l-warning" />
         <MetricCard title="Teachers Misdeployed" value={statewideDeployment.admin} note="Estimated in admin or area offices" border="border-l-accent" />
       </div>
+
+      <CriticalLgaCards />
 
       <div className="bg-card rounded-md shadow-sm border-l-4 border-l-accent">
         <button onClick={() => setDnemisOpen(!dnemisOpen)} className="w-full flex items-center justify-between gap-2 p-4 text-left hover:bg-muted/50 transition-colors">
