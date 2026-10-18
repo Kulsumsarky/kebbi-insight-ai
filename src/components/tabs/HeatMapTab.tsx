@@ -1,5 +1,7 @@
+import { useState } from "react";
+import { LgaDetailDialog } from "@/components/CriticalLgaCards";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { dnemisLgaData, DNEMIS_LTR_STANDARD, DATA_SOURCE_SHORT } from "@/data/kebbiData";
+import { dnemisLgaData, DNEMIS_LTR_STANDARD, DATA_SOURCE_SHORT, type DnemisLgaData } from "@/data/kebbiData";
 
 const tileColour = (urgency: string) => {
   if (urgency === "Critical") return "hsl(var(--destructive))";
@@ -18,6 +20,7 @@ const legend = [
 ] as const;
 
 const HeatMapTab = () => {
+  const [selected, setSelected] = useState<DnemisLgaData | null>(null);
   const rows = [...dnemisLgaData].sort((a, b) => b.ltr - a.ltr);
   const density = dnemisLgaData.map(r => ({ name: r.lga, density: perThousand(r), urgency: r.urgency })).sort((a, b) => b.density - a.density);
   return (
@@ -25,17 +28,17 @@ const HeatMapTab = () => {
       <div>
         <h3 className="font-display font-semibold text-sm text-foreground">Learners per teacher, all 21 LGAs ({DATA_SOURCE_SHORT})</h3>
         <p className="text-xs text-muted-foreground font-body mt-1">
-          Tiles are ordered from the most learners per teacher (red) to the fewest (green). The national standard is 1:{DNEMIS_LTR_STANDARD}.
+          Select a tile to see what its numbers mean. Tiles are ordered from the most learners per teacher (red) to the fewest (green). The national standard is 1:{DNEMIS_LTR_STANDARD}.
         </p>
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2">
         {rows.map(r => (
-          <div key={r.lga} className="rounded-md p-3 text-center text-white" style={{ backgroundColor: tileColour(r.urgency) }}>
+          <button type="button" key={r.lga} onClick={() => setSelected(r)} className="rounded-md p-3 text-center text-white transition-all duration-200 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" style={{ backgroundColor: tileColour(r.urgency) }}>
             <p className="text-[10px] font-display font-bold leading-tight">{r.lga}</p>
             <p className="text-lg font-display font-bold">1:{Math.round(r.ltr)}</p>
             <p className="text-[9px] opacity-90">{perThousand(r)} per 1,000 learners</p>
             <p className="text-[9px] opacity-90">{r.teachers.toLocaleString()} teachers</p>
-          </div>
+          </button>
         ))}
       </div>
       <div className="flex items-center gap-3 text-xs font-body flex-wrap">
@@ -55,6 +58,7 @@ const HeatMapTab = () => {
           </BarChart>
         </ResponsiveContainer>
       </div>
+      <LgaDetailDialog row={selected} onClose={() => setSelected(null)} />
     </div>
   );
 };

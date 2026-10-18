@@ -1,8 +1,37 @@
 import PilotBadge from "@/components/PilotBadge";
 import { AlertTriangle } from "lucide-react";
+import ExplainCard from "@/components/ExplainCard";
 import {
-  dnemisLgaData, DNEMIS_LTR_STANDARD, estimatedCoreGapsFromDnemis,
+  dnemisLgaData, dnemisTotals, DNEMIS_LTR_STANDARD, estimatedCoreGapsFromDnemis,
 } from "@/data/kebbiData";
+
+const stateLtr = dnemisTotals.learners / dnemisTotals.teachers;
+const aboveStandard = dnemisLgaData.filter(r => r.ltr > DNEMIS_LTR_STANDARD).length;
+const subjectSum = (k: "maths" | "english" | "science") => dnemisLgaData.reduce((n, r) => n + estimatedCoreGapsFromDnemis(r)[k], 0);
+
+const summaryCards = [
+  {
+    label: "Extra teachers needed (est.)", value: dnemisTotals.subjectGaps.toLocaleString(), border: "border-l-warning",
+    rows: [
+      { label: "The number", value: `${dnemisTotals.subjectGaps.toLocaleString()} (est.)`, explain: `Added up across all LGAs: the teachers needed to reach 1:${DNEMIS_LTR_STANDARD}, minus the teachers already in place.` },
+      { label: "Split by subject (est.)", explain: `Maths ${subjectSum("maths").toLocaleString()}, English ${subjectSum("english").toLocaleString()}, Science ${subjectSum("science").toLocaleString()}. The census has no subject data, so EduMap splits the total 36%, 34% and 30%.` },
+    ],
+  },
+  {
+    label: "State learners per teacher", value: `1:${stateLtr.toFixed(1)}`, border: "border-l-destructive",
+    rows: [
+      { label: "The number", value: `1:${stateLtr.toFixed(1)}`, explain: `${dnemisTotals.learners.toLocaleString()} learners divided by ${dnemisTotals.teachers.toLocaleString()} teachers across Kebbi State.` },
+      { label: "Compared with the standard", explain: `The Kebbi UBE standard is 1:${DNEMIS_LTR_STANDARD}. A state average can hide LGAs that are far worse, which is why the table below is by LGA.` },
+    ],
+  },
+  {
+    label: "LGAs above the standard", value: `${aboveStandard} of ${dnemisLgaData.length}`, border: "border-l-accent",
+    rows: [
+      { label: "The number", value: `${aboveStandard} of ${dnemisLgaData.length}`, explain: `LGAs where learners per teacher is higher than 1:${DNEMIS_LTR_STANDARD}.` },
+      { label: "What it means", explain: "In these LGAs there are more learners for each teacher than the standard allows, so classes are likely larger than planned." },
+    ],
+  },
+];
 
 const urgencyClass = {
   Low: "bg-secondary/15 text-secondary",
@@ -18,6 +47,15 @@ const TeacherGapsTab = () => (
       <p className="text-sm font-body text-foreground">
         <strong>Subject-level breakdown is estimated.</strong> Verified data pending State Ministry approval.
       </p>
+    </div>
+
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {summaryCards.map(c => (
+        <ExplainCard key={c.label} className={`bg-card rounded-md p-4 shadow-sm border-l-4 ${c.border}`} title={`${c.label}: what this number means`} description="DNEMIS Annual School Census 2024." rows={c.rows}>
+          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">{c.label}</p>
+          <p className="text-2xl font-display font-bold text-card-foreground mt-1">{c.value}</p>
+        </ExplainCard>
+      ))}
     </div>
 
     <div className="bg-card rounded-md shadow-sm overflow-x-auto">

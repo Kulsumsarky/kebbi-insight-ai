@@ -4,6 +4,7 @@ import { AlertTriangle, Sparkles } from "lucide-react";
 import { dnemisLgaData, estimatedCoreGapsFromDnemis, DNEMIS_LTR_STANDARD } from "@/data/kebbiData";
 import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ExplainCard from "@/components/ExplainCard";
 import { PUBLIC_DEMO_MODE } from "@/config";
 
 const criticalLgas = dnemisLgaData.filter(row => row.urgency === "Critical");
@@ -52,11 +53,20 @@ const AIPredictionsTab = () => {
         </div>
       )}
 
-      <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-destructive max-w-sm">
+      <ExplainCard
+        className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-destructive max-w-sm block w-full"
+        title="Highest Urgency LGAs: what this number means"
+        description="DNEMIS Annual School Census 2024."
+        rows={[
+          { label: "The number", value: String(criticalLgas.length), explain: `LGAs rated Critical because their learners-per-teacher ratio is far above the 1:${DNEMIS_LTR_STANDARD} standard.` },
+          { label: "Which ones", explain: criticalLgas.map(r => `${r.lga} (1:${r.ltr.toFixed(1)})`).join(", ") + "." },
+          { label: "How to use it", explain: "These LGAs come first in the recommendations below, because each new teacher makes the biggest difference there." },
+        ]}
+      >
         <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Highest Urgency LGAs</p>
         <p className="text-3xl font-display font-bold text-destructive mt-1">{criticalLgas.length}</p>
         <p className="text-xs text-muted-foreground font-body mt-1">LGAs rated Critical in the DNEMIS 2024 census</p>
-      </div>
+      </ExplainCard>
 
       <div className="bg-card rounded-md shadow-sm overflow-x-auto">
         <h3 className="font-display font-semibold text-sm p-4 pb-1 text-card-foreground">Recruitment Priority by Subject</h3>
