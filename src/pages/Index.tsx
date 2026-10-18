@@ -5,6 +5,7 @@ import TabNav from "@/components/TabNav";
 import OverviewTab from "@/components/tabs/OverviewTab";
 import TeacherGapsTab from "@/components/tabs/TeacherGapsTab";
 import DeploymentTab from "@/components/tabs/DeploymentTab";
+import HeatMapTab from "@/components/tabs/HeatMapTab";
 import SchoolsTab from "@/components/tabs/SchoolsTab";
 import AIPredictionsTab from "@/components/tabs/AIPredictionsTab";
 import FeedbackPrompt from "@/components/FeedbackPrompt";
@@ -13,6 +14,7 @@ import { DATA_SOURCE, PARTIAL_DATA_NOTE } from "@/data/kebbiData";
 
 const allTabs = [
   { label: "Overview", Component: OverviewTab, hiddenInDemo: false },
+  { label: "Heat Map", Component: HeatMapTab, hiddenInDemo: false },
   { label: "Teacher Gaps", Component: TeacherGapsTab, hiddenInDemo: false },
   { label: "Deployment", Component: DeploymentTab, hiddenInDemo: false },
   // Hidden during the public feedback window: the directory is illustrative until real school records arrive.
