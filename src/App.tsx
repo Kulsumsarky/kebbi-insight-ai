@@ -11,6 +11,7 @@ import Auth from "./pages/Auth.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Admin from "./pages/Admin.tsx";
+import { PUBLIC_DEMO_MODE } from "@/config";
 
 const queryClient = new QueryClient();
 
@@ -28,9 +29,13 @@ const App = () => (
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute>
+                PUBLIC_DEMO_MODE ? (
                   <Index />
-                </ProtectedRoute>
+                ) : (
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                )
               }
             />
             <Route

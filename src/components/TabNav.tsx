@@ -11,11 +11,13 @@ export const tabs = [
 ];
 
 interface TabNavProps {
+  /** Optional list of labels to show; defaults to all tabs. */
+  labels?: string[];
   activeTab: number;
   onTabChange: (i: number) => void;
 }
 
-const TabNav = ({ activeTab, onTabChange }: TabNavProps) => {
+const TabNav = ({ labels = tabs, activeTab, onTabChange }: TabNavProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useIsMobile();
 
@@ -34,12 +36,12 @@ const TabNav = ({ activeTab, onTabChange }: TabNavProps) => {
               onClick={() => setMobileOpen(!mobileOpen)}
               className="w-full flex items-center justify-between px-2 py-3 text-secondary-foreground"
             >
-              <span className="text-sm font-display font-semibold text-accent">{tabs[activeTab]}</span>
+              <span className="text-sm font-display font-semibold text-accent">{labels[activeTab]}</span>
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             {mobileOpen && (
               <div className="pb-2 space-y-1 animate-fade-in">
-                {tabs.map((tab, i) => (
+                {labels.map((tab, i) => (
                   <button
                     key={tab}
                     onClick={() => handleTabClick(i)}
@@ -58,7 +60,7 @@ const TabNav = ({ activeTab, onTabChange }: TabNavProps) => {
         ) : (
           /* Desktop: horizontal tabs */
           <div className="flex min-w-max">
-            {tabs.map((tab, i) => (
+            {labels.map((tab, i) => (
               <button
                 key={tab}
                 onClick={() => onTabChange(i)}

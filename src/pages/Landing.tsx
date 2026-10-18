@@ -21,6 +21,7 @@ import nigeriaMap from "@/assets/nigeria-kebbi-map.png";
 import { Button } from "@/components/ui/button";
 import { DATA_SOURCE } from "@/data/kebbiData";
 import ChatWidget from "@/components/ChatWidget";
+import { PUBLIC_DEMO_MODE } from "@/config";
 
 const CONTACT_EMAIL = "hello@edumap.com.ng";
 const LINKEDIN_HANDLE = "@edumap";
@@ -40,7 +41,12 @@ const pilotLgas = ["Birnin Kebbi", "Kalgo", "Argungu", "Gwandu", "Aliero"];
 const faqs = [
   { q: "What is EduMap NG?", a: "A platform that turns school-level teacher data into clear evidence for planning and posting decisions in Kebbi State." },
   { q: "Where does the data come from?", a: "It is built on DNEMIS data, and school-level records collected with local government education authorities." },
-  { q: "Who can see it?", a: "Only authorised officials. Data is handled with the consent of the relevant authorities." },
+  {
+    q: "Who can see it?",
+    a: PUBLIC_DEMO_MODE
+      ? "For a short feedback window, a preview of the dashboard is open to everyone. After that, access is for authorised officials only. Data is handled with the consent of the relevant authorities."
+      : "Only authorised officials. Data is handled with the consent of the relevant authorities.",
+  },
   { q: "Is it free during the pilot?", a: "We will confirm pilot terms with your office during a short briefing. Write to us to arrange one." },
   { q: "How do LGEAs take part?", a: "We begin with five pilot LGAs and work with their education authorities to collect and verify school-level data." },
   { q: "Is our data safe?", a: "Data is held securely and shared only with authorised officials, with the consent of the relevant authorities." },
@@ -244,6 +250,14 @@ const Landing = () => (
               Map gaps. Align action. Strengthen schools.
             </p>
             <div className="flex flex-wrap items-center gap-3">
+              {PUBLIC_DEMO_MODE && (
+                <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-display font-semibold group">
+                  <Link to="/dashboard">
+                    Explore the dashboard
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+              )}
               <Button size="lg" onClick={openBriefing} className="bg-primary text-primary-foreground hover:bg-primary/90 font-display font-semibold group">
                 Request a briefing
                 <ArrowUpRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -258,7 +272,11 @@ const Landing = () => (
               </Button>
             </div>
             <p className="mt-3.5 text-xs text-muted-foreground font-body">
-              Officials with an account can <Link to="/auth" className="underline underline-offset-2">sign in here</Link>.
+              {PUBLIC_DEMO_MODE ? (
+                <>Open preview for feedback. Figures marked (est.) are estimates. Officials with an account can <Link to="/auth" className="underline underline-offset-2">sign in here</Link>.</>
+              ) : (
+                <>Officials with an account can <Link to="/auth" className="underline underline-offset-2">sign in here</Link>.</>
+              )}
             </p>
           </div>
           <HeroIllustration />
@@ -368,7 +386,9 @@ const Landing = () => (
       {/* Trust */}
       <section className="container py-12 md:py-16">
         <p className="text-sm text-muted-foreground font-body max-w-2xl">
-          Data is handled with the consent of the relevant authorities and shared only with authorised officials.
+          {PUBLIC_DEMO_MODE
+            ? "A preview is open for a short feedback window. Full access is for authorised officials, and data is handled with the consent of the relevant authorities."
+            : "Data is handled with the consent of the relevant authorities and shared only with authorised officials."}
         </p>
       </section>
 
@@ -435,7 +455,9 @@ const Landing = () => (
         <div className="border-t border-border pt-3 space-y-1">
           <p className="text-xs text-muted-foreground font-body">{DATA_SOURCE}</p>
           <p className="text-xs text-muted-foreground font-body">
-            Access to the dashboard is restricted to authorised officials. To request an account, email {CONTACT_EMAIL}.
+            {PUBLIC_DEMO_MODE
+              ? `A preview of the dashboard is open for a short feedback window. For full access, email ${CONTACT_EMAIL}.`
+              : `Access to the dashboard is restricted to authorised officials. To request an account, email ${CONTACT_EMAIL}.`}
           </p>
         </div>
       </div>
