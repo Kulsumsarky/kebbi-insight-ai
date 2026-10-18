@@ -24,7 +24,7 @@ const DeploymentTab = () => (
       {[
         ["Classroom-posted teachers", statewideDeployment.classroom, percent(statewideDeployment.classroom), "border-l-secondary"],
         ["Admin/area office posted", statewideDeployment.admin, percent(statewideDeployment.admin), "border-l-accent"],
-        ["Unaccounted / unverified", statewideDeployment.unverified, percent(statewideDeployment.unverified), "border-l-destructive"],
+        ["Not yet verified", statewideDeployment.unverified, percent(statewideDeployment.unverified), "border-l-destructive"],
       ].map(([label, value, share, border]) => (
         <div key={String(label)} className={`bg-card rounded-md p-4 shadow-sm border-l-4 ${border}`}>
           <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">{label}</p>

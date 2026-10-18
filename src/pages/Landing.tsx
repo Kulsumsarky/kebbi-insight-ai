@@ -67,7 +67,7 @@ const whatItDoes = [
   {
     icon: Users,
     title: "Checks whether deployment adds up",
-    text: "Separates teachers actually in classrooms from those in administrative offices and those unaccounted for.",
+    text: "Separates teachers actually in classrooms from those in administrative offices and those whose posting is not yet verified.",
   },
   {
     icon: Target,
