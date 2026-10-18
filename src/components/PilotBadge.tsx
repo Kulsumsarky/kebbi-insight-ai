@@ -1,12 +1,11 @@
-/** Year 1 pilot LGEAs — phased rollout, not all 21 at once. */
-export const PILOT_LGAS = ["Birnin Kebbi", "Kalgo", "Argungu", "Gwandu", "Aliero"];
-const DATA_COMPLETE = "Birnin Kebbi";
+/** Pilot LGEAs: two to start, more only if the pilot works. */
+export const PILOT_LGAS = ["Kalgo", "Gwandu"];
 
 export const isPilotLga = (lga: string) => PILOT_LGAS.includes(lga);
 
 const PilotBadge = ({ lga }: { lga: string }) => {
   if (!isPilotLga(lga)) return null;
-  const complete = lga === DATA_COMPLETE;
+  const complete = false;
   return (
     <span
       title={complete ? "Year 1 Pilot — full subject-level data available" : "Year 1 Pilot — data collection in progress"}

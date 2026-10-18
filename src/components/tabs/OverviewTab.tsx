@@ -28,15 +28,22 @@ const MetricCard = ({ title, value, note, border }: { title: string; value: numb
 const OverviewTab = () => {
   const [dnemisOpen, setDnemisOpen] = useState(false);
   const gapChartData = [...dnemisLgaData].sort((a, b) => b.ltr - a.ltr).map(lga => ({ name: lga.lga, ltr: lga.ltr, urgency: lga.urgency }));
-  const topTeachers = [...dnemisLgaData].sort((a, b) => b.teachers - a.teachers).slice(0, 8).map(lga => ({ name: lga.lga, teachers: lga.teachers }));
+  const topTeachers = [...dnemisLgaData]
+    .map(lga => ({ name: lga.lga, teachers: Math.max(0, Math.ceil(lga.learners / DNEMIS_LTR_STANDARD) - lga.teachers) }))
+    .sort((a, b) => b.teachers - a.teachers)
+    .slice(0, 8);
+  const above = dnemisLgaData.filter(l => l.ltr > DNEMIS_LTR_STANDARD).length;
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <p className="text-sm font-body text-foreground bg-card rounded-md p-4 shadow-sm border-l-4 border-l-primary">
+        {above} of {dnemisLgaData.length} LGAs have more than {DNEMIS_LTR_STANDARD} learners per teacher. {dnemisTotals.criticalLgas} are at critical shortage.
+      </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard title="Total Teachers Deployed" value={dnemisTotals.teachers} note="DNEMIS Annual School Census 2024" border="border-l-secondary" />
+        <MetricCard title="Total Teachers Deployed" value={dnemisTotals.teachers} note="DNEMIS Annual School Census, 2024 data" border="border-l-secondary" />
         <MetricCard title="LGAs at Critical Shortage" value={dnemisTotals.criticalLgas} note="DNEMIS urgency classification" border="border-l-destructive" />
         <MetricCard title="Subject Gaps Identified" value={dnemisTotals.subjectGaps} note="Estimated Maths, English and Science shortfalls" border="border-l-warning" />
-        <MetricCard title="Teachers Misdeployed" value={statewideDeployment.admin} note="Estimated in admin or area offices" border="border-l-accent" />
+        <MetricCard title="Teachers in Admin Offices (est.)" value={statewideDeployment.admin} note="Estimate: posted to admin or area offices, not classrooms" border="border-l-accent" />
       </div>
 
       <CriticalLgaCards />
@@ -62,12 +69,12 @@ const OverviewTab = () => {
           </ResponsiveContainer>
         </div>
         <div className="bg-card rounded-md p-4 shadow-sm">
-          <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Top 8 LGAs by Teacher Count</h3>
+          <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Extra Teachers Needed to Reach 1:35 (Top 8 LGAs)</h3>
           <ResponsiveContainer width="100%" height={320}>
             <BarChart data={topTeachers} layout="vertical" margin={{ left: 55 }}>
               <XAxis type="number" tick={{ fontSize: 10 }} />
               <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={85} />
-              <Tooltip formatter={(value: number) => [value.toLocaleString(), "Teachers"]} />
+              <Tooltip formatter={(value: number) => [value.toLocaleString(), "More teachers needed"]} />
               <Bar dataKey="teachers" fill="hsl(var(--secondary))" radius={[0, 2, 2, 0]} />
             </BarChart>
           </ResponsiveContainer>
