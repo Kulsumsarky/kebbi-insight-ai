@@ -4,6 +4,7 @@ import { AlertTriangle, Sparkles } from "lucide-react";
 import { dnemisLgaData, estimatedCoreGapsFromDnemis, DNEMIS_LTR_STANDARD } from "@/data/kebbiData";
 import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PUBLIC_DEMO_MODE } from "@/config";
 
 const criticalLgas = dnemisLgaData.filter(row => row.urgency === "Critical");
 const aggregateGap = (r: (typeof dnemisLgaData)[number]) => { const g = estimatedCoreGapsFromDnemis(r); return g.maths + g.english + g.science; };
@@ -40,13 +41,16 @@ const AIPredictionsTab = () => {
         </p>
       </div>
 
-      <div className="bg-secondary/40 border border-primary/30 rounded-md p-4 flex items-start gap-3">
-        <ShieldCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-        <div>
-          <p className="text-[10px] font-display font-semibold uppercase tracking-widest text-primary mb-1">SUBEB corroboration</p>
-          <p className="text-sm font-body text-foreground">The subject-specific teacher shortage pattern shown here has been independently corroborated by Kebbi State's SUBEB (Universal Basic Education Board), Directorate of Planning, Research and Statistics, based on their own internal data (October 2026).</p>
+      {/* Hidden during the public feedback window: the source is not named publicly. */}
+      {!PUBLIC_DEMO_MODE && (
+        <div className="bg-secondary/40 border border-primary/30 rounded-md p-4 flex items-start gap-3">
+          <ShieldCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-[10px] font-display font-semibold uppercase tracking-widest text-primary mb-1">SUBEB corroboration</p>
+            <p className="text-sm font-body text-foreground">The subject-specific teacher shortage pattern shown here has been independently corroborated by Kebbi State's SUBEB (Universal Basic Education Board), Directorate of Planning, Research and Statistics, based on their own internal data (October 2026).</p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="bg-card rounded-md p-4 shadow-sm border-l-4 border-l-destructive max-w-sm">
         <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">Highest Urgency LGAs</p>
