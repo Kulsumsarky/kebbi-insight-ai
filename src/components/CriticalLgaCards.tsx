@@ -24,6 +24,45 @@ const Row = ({ label, value, explain }: { label: string; value: string; explain:
   </div>
 );
 
+
+/** Plain-language explanation of one LGA's census figures. */
+export const LgaDetailDialog = ({ row, onClose }: { row: DnemisLgaData | null; onClose: () => void }) => (
+  <Dialog open={row !== null} onOpenChange={(open) => !open && onClose()}>
+    <DialogContent className="max-h-[90vh] overflow-y-auto">
+      {row && (
+        <>
+          <DialogHeader>
+            <DialogTitle className="font-display">{row.lga}: what these numbers mean</DialogTitle>
+            <DialogDescription>{DATA_SOURCE_SHORT}. Figures are LGA totals.</DialogDescription>
+          </DialogHeader>
+          <div>
+            <Row label="Teachers" value={fmt(row.teachers)} explain={`The census counts ${fmt(row.teachers)} teachers across ${fmt(row.schools)} schools in ${row.lga}.`} />
+            <Row label="Learners" value={fmt(row.learners)} explain="The total number of learners enrolled in those schools." />
+            <Row
+              label="Learners per teacher"
+              value={`1:${row.ltr.toFixed(1)}`}
+              explain={`${fmt(row.learners)} learners divided by ${fmt(row.teachers)} teachers. The standard is 1:${DNEMIS_LTR_STANDARD}, so ${row.lga} is ${(row.ltr / DNEMIS_LTR_STANDARD).toFixed(1)} times the standard. It is rated ${row.urgency}.`}
+            />
+            <Row
+              label="Teachers to reach the standard"
+              value={extraTeachersNeeded(row) > 0 ? `about ${fmt(extraTeachersNeeded(row))} more` : "none"}
+              explain={
+                extraTeachersNeeded(row) > 0
+                  ? `To reach 1:${DNEMIS_LTR_STANDARD}, ${row.lga} would need about ${fmt(Math.ceil(row.learners / DNEMIS_LTR_STANDARD))} teachers (${fmt(row.learners)} ÷ ${DNEMIS_LTR_STANDARD}). It has ${fmt(row.teachers)}. This is a calculation from census totals, not a school-by-school count.`
+                  : `${row.lga} already has enough teachers for the 1:${DNEMIS_LTR_STANDARD} standard in total. Individual schools may still be short.`
+              }
+            />
+            <Row label="Female teachers" value={`${row.femaleTeachersPct.toFixed(1)}%`} explain="The share of the LGA's teachers who are women." />
+          </div>
+          <p className="text-xs text-muted-foreground font-body">
+            Subject-level and school-level figures are still being collected, and any shown elsewhere on this dashboard are marked (est.).
+          </p>
+        </>
+      )}
+    </DialogContent>
+  </Dialog>
+);
+
 const CriticalLgaCards = () => {
   const [selected, setSelected] = useState<DnemisLgaData | null>(null);
 
@@ -51,50 +90,7 @@ const CriticalLgaCards = () => {
         ))}
       </div>
 
-      <Dialog open={selected !== null} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
-          {selected && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="font-display">{selected.lga}: what these numbers mean</DialogTitle>
-                <DialogDescription>
-                  {DATA_SOURCE_SHORT}. Figures are LGA totals.
-                </DialogDescription>
-              </DialogHeader>
-              <div>
-                <Row
-                  label="Teachers"
-                  value={fmt(selected.teachers)}
-                  explain={`The census counts ${fmt(selected.teachers)} teachers across ${fmt(selected.schools)} schools in ${selected.lga}.`}
-                />
-                <Row
-                  label="Learners"
-                  value={fmt(selected.learners)}
-                  explain="The total number of learners enrolled in those schools."
-                />
-                <Row
-                  label="Learners per teacher"
-                  value={`1:${selected.ltr.toFixed(1)}`}
-                  explain={`${fmt(selected.learners)} learners divided by ${fmt(selected.teachers)} teachers. The standard is 1:${DNEMIS_LTR_STANDARD}, so ${selected.lga} is ${(selected.ltr / DNEMIS_LTR_STANDARD).toFixed(1)} times the standard. That is why it is marked Critical.`}
-                />
-                <Row
-                  label="Teachers to reach the standard"
-                  value={`about ${fmt(extraTeachersNeeded(selected))} more`}
-                  explain={`To reach 1:${DNEMIS_LTR_STANDARD}, ${selected.lga} would need about ${fmt(Math.ceil(selected.learners / DNEMIS_LTR_STANDARD))} teachers (${fmt(selected.learners)} ÷ ${DNEMIS_LTR_STANDARD}). It has ${fmt(selected.teachers)}. This is a calculation from census totals, not a school-by-school count.`}
-                />
-                <Row
-                  label="Female teachers"
-                  value={`${selected.femaleTeachersPct.toFixed(1)}%`}
-                  explain="The share of the LGA's teachers who are women."
-                />
-              </div>
-              <p className="text-xs text-muted-foreground font-body">
-                Subject-level and school-level figures are still being collected, and any shown elsewhere on this dashboard are marked (est.).
-              </p>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <LgaDetailDialog row={selected} onClose={() => setSelected(null)} />
     </section>
   );
 };

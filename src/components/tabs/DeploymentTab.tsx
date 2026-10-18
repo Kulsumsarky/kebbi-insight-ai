@@ -1,6 +1,7 @@
 import PilotBadge from "@/components/PilotBadge";
 import { AlertTriangle } from "lucide-react";
 import { deploymentByLga, statewideDeployment } from "@/data/kebbiData";
+import ExplainCard from "@/components/ExplainCard";
 import PendingBadge from "@/components/PendingBadge";
 
 const percent = (value: number) => Math.round((value / statewideDeployment.total) * 100);
@@ -9,6 +10,12 @@ const statusFor = (classroomPercent: number) => {
   if (classroomPercent > 85) return { label: "Strong", className: "bg-secondary/15 text-secondary" };
   if (classroomPercent >= 65) return { label: "Review", className: "bg-accent/20 text-accent" };
   return { label: "Critical", className: "bg-destructive/10 text-destructive" };
+};
+
+const deploymentMeaning: Record<string, string> = {
+  "Classroom-posted teachers": "Teachers estimated to be teaching in schools. This is the group that actually reduces the learners-per-teacher ratio.",
+  "Admin/area office posted": "Teachers estimated to be working in administrative or area offices. Moving some back to classrooms is the cheapest way to ease a shortage.",
+  "Not yet verified": "Teachers whose posting cannot yet be confirmed from the data. Checking these records is the first step before any redeployment.",
 };
 
 const DeploymentTab = () => (
@@ -26,11 +33,21 @@ const DeploymentTab = () => (
         ["Admin/area office posted", statewideDeployment.admin, percent(statewideDeployment.admin), "border-l-accent"],
         ["Not yet verified", statewideDeployment.unverified, percent(statewideDeployment.unverified), "border-l-destructive"],
       ].map(([label, value, share, border]) => (
-        <div key={String(label)} className={`bg-card rounded-md p-4 shadow-sm border-l-4 ${border}`}>
+        <ExplainCard
+          key={String(label)}
+          className={`bg-card rounded-md p-4 shadow-sm border-l-4 ${border}`}
+          title={`${label}: what this number means`}
+          description="Estimated. The census gives LGA totals, not where each teacher is posted."
+          rows={[
+            { label: "The number", value: `${Number(value).toLocaleString()} (est.)`, explain: `${share}% of the ${statewideDeployment.total.toLocaleString()} teachers in the census.` },
+            { label: "What it means", explain: deploymentMeaning[String(label)] },
+            { label: "How it is estimated", explain: "Reported LGA totals are split using an administrative rate of 8 to 12% and a verification allowance of 4 to 8%, adjusted by shortage severity. School-level records will replace this." },
+          ]}
+        >
           <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">{label}</p>
           <p className="text-2xl font-display font-bold text-card-foreground mt-1">{Number(value).toLocaleString()}</p>
           <p className="text-xs text-muted-foreground font-body mt-1">{share}% of deployed teachers · Estimated</p>
-        </div>
+        </ExplainCard>
       ))}
     </div>
 

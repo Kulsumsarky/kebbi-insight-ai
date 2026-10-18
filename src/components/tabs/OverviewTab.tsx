@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import {
-  dnemisLgaData, dnemisTotals, DNEMIS_LTR_STANDARD, DNEMIS_NOTE, statewideDeployment,
+  dnemisLgaData, dnemisTotals, DNEMIS_LTR_STANDARD, DNEMIS_NOTE, DATA_SOURCE_SHORT, statewideDeployment,
 } from "@/data/kebbiData";
 import { ChevronDown, ChevronUp, Scale } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import CriticalLgaCards from "@/components/CriticalLgaCards";
+import ExplainCard from "@/components/ExplainCard";
 
 const gapColour = (urgency: string) => {
   if (urgency === "Critical") return "hsl(var(--destructive))";
@@ -14,14 +15,21 @@ const gapColour = (urgency: string) => {
   return "hsl(var(--secondary))";
 };
 
-const MetricCard = ({ title, value, note, border }: { title: string; value: number; note: string; border: string }) => {
+const MetricCard = ({ title, value, note, border, explain }: { title: string; value: number; note: string; border: string; explain: { label: string; value?: string; explain: string }[] }) => {
   const { count, ref } = useCountUp(value);
   return (
-    <div ref={ref} className={`bg-card rounded-md p-4 shadow-sm border-l-4 ${border} transition-all duration-200 hover:shadow-lg hover:-translate-y-1`}>
-      <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">{title}</p>
-      <p className="text-2xl font-display font-bold mt-1 text-card-foreground">{count.toLocaleString()}</p>
-      <p className="text-xs mt-2 text-muted-foreground font-body">{note}</p>
-    </div>
+    <ExplainCard
+      className={`bg-card rounded-md p-4 shadow-sm border-l-4 ${border}`}
+      title={`${title}: what this number means`}
+      description="Select any card on this dashboard to see how its number is worked out."
+      rows={explain}
+    >
+      <div ref={ref}>
+        <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">{title}</p>
+        <p className="text-2xl font-display font-bold mt-1 text-card-foreground">{count.toLocaleString()}</p>
+        <p className="text-xs mt-2 text-muted-foreground font-body">{note}</p>
+      </div>
+    </ExplainCard>
   );
 };
 
@@ -40,10 +48,22 @@ const OverviewTab = () => {
         {above} of {dnemisLgaData.length} LGAs have more than {DNEMIS_LTR_STANDARD} learners per teacher. {dnemisTotals.criticalLgas} are at critical shortage.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard title="Total Teachers Deployed" value={dnemisTotals.teachers} note="DNEMIS Annual School Census, 2024 data" border="border-l-secondary" />
-        <MetricCard title="LGAs at Critical Shortage" value={dnemisTotals.criticalLgas} note="DNEMIS urgency classification" border="border-l-destructive" />
-        <MetricCard title="Subject Gaps Identified" value={dnemisTotals.subjectGaps} note="Estimated Maths, English and Science shortfalls" border="border-l-warning" />
-        <MetricCard title="Teachers in Admin Offices (est.)" value={statewideDeployment.admin} note="Estimate: posted to admin or area offices, not classrooms" border="border-l-accent" />
+        <MetricCard title="Total Teachers Deployed" value={dnemisTotals.teachers} note="DNEMIS Annual School Census, 2024 data" border="border-l-secondary" explain={[
+          { label: "What it counts", value: dnemisTotals.teachers.toLocaleString(), explain: `All teachers recorded in the ${DATA_SOURCE_SHORT} across the ${dnemisLgaData.length} LGAs of Kebbi State, added together.` },
+          { label: "What it does not tell you", explain: "It is a head count from census totals. It does not say which school each teacher is in, or what subject they teach." },
+        ]} />
+        <MetricCard title="LGAs at Critical Shortage" value={dnemisTotals.criticalLgas} note="DNEMIS urgency classification" border="border-l-destructive" explain={[
+          { label: "How an LGA becomes Critical", value: `${dnemisTotals.criticalLgas} of ${dnemisLgaData.length}`, explain: `EduMap compares learners per teacher with the standard of 1:${DNEMIS_LTR_STANDARD}. LGAs with the highest ratios are rated Critical, then High, Moderate and Lower.` },
+          { label: "Which ones", explain: `${dnemisLgaData.filter(r => r.urgency === "Critical").map(r => r.lga).join(", ")}. Select any of the cards below to see each LGA's figures.` },
+        ]} />
+        <MetricCard title="Subject Gaps Identified" value={dnemisTotals.subjectGaps} note="Estimated Maths, English and Science shortfalls" border="border-l-warning" explain={[
+          { label: "What it counts", value: `${dnemisTotals.subjectGaps.toLocaleString()} (est.)`, explain: `For each LGA, EduMap works out how many more teachers are needed to reach 1:${DNEMIS_LTR_STANDARD}, then adds the LGAs up.` },
+          { label: "Why it is an estimate", explain: "The census does not list teachers by subject. EduMap splits the shortfall 36% Maths, 34% English and 30% Science. Real subject figures will replace this once schools report them." },
+        ]} />
+        <MetricCard title="Teachers in Admin Offices (est.)" value={statewideDeployment.admin} note="Estimate: posted to admin or area offices, not classrooms" border="border-l-accent" explain={[
+          { label: "What it counts", value: `${statewideDeployment.admin.toLocaleString()} (est.)`, explain: "Teachers estimated to be posted to administrative or area offices instead of classrooms." },
+          { label: "Why it is an estimate", explain: "The census gives LGA totals only. EduMap assumes about 8 to 12% of teachers are in offices, adjusted by how severe the shortage is. School-level posting records are needed to confirm it." },
+        ]} />
       </div>
 
       <CriticalLgaCards />
