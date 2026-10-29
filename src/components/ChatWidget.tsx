@@ -10,7 +10,7 @@ const CONTACT_EMAIL = "hello@edumap.com.ng";
 type View = "menu" | "faq" | "contact" | "official" | "update" | "done";
 
 const FAQS = [
-  { q: "What is EduMap NG?", a: "A platform that turns school-level teacher data into clear, current evidence for planning and posting decisions in Kebbi State." },
+  { q: "What is EduMap?", a: "A platform that turns school-level teacher data into clear, current evidence for planning and posting decisions in Kebbi State." },
   { q: "Where does the data come from?", a: "It is built on DNEMIS data and school-level records collected with local government education authorities." },
   { q: "Who can see the data?", a: "Only authorised officials. Data is handled with the consent of the relevant authorities." },
   { q: "Which LGAs are in the pilot?", a: "Birnin Kebbi, Kalgo, Argungu, Gwandu and Aliero." },
@@ -67,7 +67,7 @@ const ChatWidget = () => {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           ...payload,
-          _subject: "EduMap NG: new briefing request",
+          _subject: "EduMap: new briefing request",
           _template: "table",
           _captcha: "false",
         }),
@@ -150,7 +150,7 @@ const ChatWidget = () => {
                   <ArrowLeft className="w-4 h-4" />
                 </button>
               )}
-              <span className="font-display font-semibold">EduMap NG</span>
+              <span className="font-display font-semibold">EduMap</span>
             </div>
             <button onClick={() => setOpen(false)} aria-label="Close chat">
               <X className="w-4 h-4" />
@@ -161,9 +161,9 @@ const ChatWidget = () => {
             {view === "menu" && (
               <>
                 <p className="text-sm text-muted-foreground font-body">
-                  Welcome to EduMap NG. How can we help?
+                  Welcome to EduMap. How can we help?
                 </p>
-                <MenuBtn label="About EduMap NG (FAQ)" onClick={() => goto("faq")} />
+                <MenuBtn label="About EduMap (FAQ)" onClick={() => goto("faq")} />
                 <MenuBtn label="Contact the team" onClick={() => goto("contact")} />
                 <MenuBtn label="I am a registered official: send an update" onClick={() => goto("official")} />
               </>
