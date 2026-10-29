@@ -1,4 +1,5 @@
 import PilotBadge from "@/components/PilotBadge";
+import RowCard from "@/components/RowCard";
 import { useState } from "react";
 import { AlertTriangle, Sparkles } from "lucide-react";
 import { estimatedCoreGapsFromDnemis, DNEMIS_LTR_STANDARD, type DnemisLgaData } from "@/data/kebbiData";
@@ -71,7 +72,23 @@ const AIPredictionsTab = () => {
         <p className="text-xs text-muted-foreground font-body mt-1">LGAs rated Critical in the DNEMIS 2024 census</p>
       </ExplainCard>
 
-      <div className="bg-card rounded-md shadow-sm overflow-x-auto">
+      <div className="sm:hidden space-y-3">
+        <h3 className="font-display font-semibold text-sm text-card-foreground">Recruitment Priority by Subject</h3>
+        {recruitmentPriority.map((row, index) => (
+          <RowCard
+            key={row.subject}
+            title={row.subject}
+            badges={<span className={`text-xs font-semibold px-2 py-1 rounded-full ${index === 0 ? "bg-destructive/10 text-destructive" : index === 1 ? "bg-warning/15 text-warning" : "bg-accent/15 text-foreground"}`}>#{index + 1}</span>}
+            rows={[
+              { label: "Est. teachers needed", value: `${row.gap.toLocaleString()} (est.)` },
+              { label: "Share of shortfall", value: `${totalSubjectGap ? Math.round((row.gap / totalSubjectGap) * 100) : 0}%` },
+              { label: "LGAs affected", value: `${row.lgas} of 21` },
+            ]}
+          />
+        ))}
+      </div>
+
+      <div className="hidden sm:block bg-card rounded-md shadow-sm overflow-x-auto">
         <h3 className="font-display font-semibold text-sm p-4 pb-1 text-card-foreground">Recruitment Priority by Subject</h3>
         <p className="text-xs text-muted-foreground font-body px-4 pb-3">Ranked most urgent first, by estimated teachers needed to reach the standard of 35 learners for every teacher.</p>
         <table className="w-full text-sm font-body">
@@ -90,7 +107,24 @@ const AIPredictionsTab = () => {
         </table>
       </div>
 
-      <div className="bg-card rounded-md shadow-sm overflow-x-auto">
+      <div className="sm:hidden space-y-3">
+        <h3 className="font-display font-semibold text-sm text-card-foreground">Intervention Recommendations</h3>
+        {interventions.map(({ row, gap }) => (
+          <RowCard
+            key={row.lga}
+            title={<>{row.lga}<PilotBadge lga={row.lga} /></>}
+            badges={<span className={`text-xs font-semibold px-2 py-1 rounded-full ${row.urgency === "Critical" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning"}`}>{statusWord(row.urgency)}</span>}
+            rows={[
+              { label: "Gap type", value: `${Math.round(row.ltr)} learners for every teacher (standard: ${DNEMIS_LTR_STANDARD}); ${row.femaleTeachersPct}% female teachers`, wide: true },
+              { label: "Recommended action", value: actionFor(row), wide: true },
+              { label: "Est. teachers needed", value: `${gap.toLocaleString()} (est.)` },
+              { label: "Students affected", value: `${row.learners.toLocaleString()} learners` },
+            ]}
+          />
+        ))}
+      </div>
+
+      <div className="hidden sm:block bg-card rounded-md shadow-sm overflow-x-auto">
         <h3 className="font-display font-semibold text-sm p-4 pb-2 text-card-foreground">Intervention Recommendations</h3>
         <table className="w-full text-sm font-body">
           <thead><tr className="bg-muted text-left">

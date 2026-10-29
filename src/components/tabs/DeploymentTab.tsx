@@ -1,4 +1,5 @@
 import PilotBadge from "@/components/PilotBadge";
+import RowCard from "@/components/RowCard";
 import { AlertTriangle } from "lucide-react";
 import { useYearData } from "@/hooks/useYear";
 import ExplainCard from "@/components/ExplainCard";
@@ -52,7 +53,29 @@ const DeploymentTab = () => {
       ))}
     </div>
 
-    <div className="bg-card rounded-md shadow-sm overflow-x-auto">
+    <div className="sm:hidden space-y-3">
+      {deploymentByLga.map(row => {
+        const status = row.classroomPercent === null ? null : statusFor(row.classroomPercent);
+        const est = (n: number | null) => (n === null ? <PendingBadge /> : <>{n.toLocaleString()} <span className="text-xs text-muted-foreground">(est.)</span></>);
+        return (
+          <RowCard
+            key={row.lga}
+            title={<>{row.lga}<PilotBadge lga={row.lga} /></>}
+            badges={status && row.classroomPercent !== null ? (
+              <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${status.className}`}>{status.label} · {row.classroomPercent}%</span>
+            ) : <PendingBadge />}
+            rows={[
+              { label: "Total deployed", value: row.total === null ? <PendingBadge /> : row.total.toLocaleString() },
+              { label: "In classroom", value: est(row.classroom) },
+              { label: "In admin office", value: est(row.admin) },
+              { label: "Unverified", value: est(row.unverified) },
+            ]}
+          />
+        );
+      })}
+    </div>
+
+    <div className="hidden sm:block bg-card rounded-md shadow-sm overflow-x-auto">
       <table className="w-full text-sm font-body">
         <thead>
           <tr className="bg-muted text-left">

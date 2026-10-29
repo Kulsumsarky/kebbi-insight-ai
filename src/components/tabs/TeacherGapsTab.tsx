@@ -1,4 +1,5 @@
 import PilotBadge from "@/components/PilotBadge";
+import RowCard from "@/components/RowCard";
 import { AlertTriangle } from "lucide-react";
 import ExplainCard from "@/components/ExplainCard";
 import { DNEMIS_LTR_STANDARD, estimatedCoreGapsFromDnemis } from "@/data/kebbiData";
@@ -59,7 +60,31 @@ const TeacherGapsTab = () => {
       ))}
     </div>
 
-    <div className="bg-card rounded-md shadow-sm overflow-x-auto">
+    <div className="sm:hidden space-y-3">
+      {dnemisLgaData.map(lga => {
+        const gaps = estimatedCoreGapsFromDnemis(lga);
+        const est = <span className="text-xs text-muted-foreground"> (est.)</span>;
+        return (
+          <RowCard
+            key={lga.lga}
+            title={<>{lga.lga}<PilotBadge lga={lga.lga} /></>}
+            badges={<span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${urgencyClass[lga.urgency]}`}>{statusWord(lga.urgency)}</span>}
+            rows={[
+              { label: "Learners for every teacher", value: Math.round(lga.ltr) },
+              { label: "Schools", value: lga.schools.toLocaleString() },
+              { label: "Learners", value: lga.learners.toLocaleString() },
+              { label: "Teachers", value: lga.teachers.toLocaleString() },
+              { label: "Female teachers", value: `${lga.femaleTeachersPct.toFixed(1)}%` },
+              { label: "Maths gap", value: <>{gaps.maths.toLocaleString()}{est}</> },
+              { label: "English gap", value: <>{gaps.english.toLocaleString()}{est}</> },
+              { label: "Science gap", value: <>{gaps.science.toLocaleString()}{est}</> },
+            ]}
+          />
+        );
+      })}
+    </div>
+
+    <div className="hidden sm:block bg-card rounded-md shadow-sm overflow-x-auto">
       <table className="w-full text-sm font-body">
         <thead>
           <tr className="bg-muted text-left">
