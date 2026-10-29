@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { DNEMIS_LTR_STANDARD, DNEMIS_NOTE } from "@/data/kebbiData";
 import { useYearData } from "@/hooks/useYear";
+import { ratioWords, statusWord } from "@/lib/wording";
 import { ChevronDown, ChevronUp, Scale } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import CriticalLgaCards from "@/components/CriticalLgaCards";
@@ -65,11 +66,11 @@ const OverviewTab = () => {
           { label: "What it does not tell you", explain: "It is a head count from census totals. It does not say which school each teacher is in, or what subject they teach." },
         ]} />
         <MetricCard title="LGAs at Critical Shortage" value={dnemisTotals.criticalLgas} note="DNEMIS urgency classification" border="border-l-destructive" explain={[
-          { label: "How an LGA becomes Critical", value: `${dnemisTotals.criticalLgas} of ${dnemisLgaData.length}`, explain: `EduMap compares learners per teacher with the standard of 1:${DNEMIS_LTR_STANDARD}. LGAs with the highest ratios are rated Critical, then High, Moderate and Lower.` },
+          { label: "How an LGA becomes Critical", value: `${dnemisTotals.criticalLgas} of ${dnemisLgaData.length}`, explain: `EduMap compares learners per teacher with the standard of ${DNEMIS_LTR_STANDARD} learners for every teacher. LGAs with the highest ratios are rated Critical, then High, Moderate and Lower.` },
           { label: "Which ones", explain: `${dnemisLgaData.filter(r => r.urgency === "Critical").map(r => r.lga).join(", ")}. Select any of the cards below to see each LGA's figures.` },
         ]} />
         <MetricCard title="Subject Gaps Identified" value={dnemisTotals.subjectGaps} note="Estimated Maths, English and Science shortfalls" border="border-l-warning" explain={[
-          { label: "What it counts", value: `${dnemisTotals.subjectGaps.toLocaleString()} (est.)`, explain: `For each LGA, EduMap works out how many more teachers are needed to reach 1:${DNEMIS_LTR_STANDARD}, then adds the LGAs up.` },
+          { label: "What it counts", value: `${dnemisTotals.subjectGaps.toLocaleString()} (est.)`, explain: `For each LGA, EduMap works out how many more teachers are needed to reach ${DNEMIS_LTR_STANDARD} learners for every teacher, then adds the LGAs up.` },
           { label: "Why it is an estimate", explain: "The census does not list teachers by subject. EduMap splits the shortfall 36% Maths, 34% English and 30% Science. Real subject figures will replace this once schools report them." },
         ]} />
         <MetricCard title="Teachers in Admin Offices (est.)" value={statewideDeployment.admin} note="Estimate: posted to admin or area offices, not classrooms" border="border-l-accent" explain={[
@@ -95,10 +96,18 @@ const OverviewTab = () => {
             <BarChart data={gapChartData} margin={{ left: 0, right: 0 }}>
               <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" height={85} />
               <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip formatter={(value: number) => [`1:${value.toFixed(1)}`, `LTR (standard 1:${DNEMIS_LTR_STANDARD})`]} />
+              <Tooltip formatter={(value: number) => [ratioWords(value), `Standard: ${DNEMIS_LTR_STANDARD}`]} />
               <Bar dataKey="ltr" radius={[2, 2, 0, 0]}>{gapChartData.map(entry => <Cell key={entry.name} fill={gapColour(entry.urgency)} />)}</Bar>
             </BarChart>
           </ResponsiveContainer>
+          <div className="flex flex-wrap items-center gap-3 text-xs font-body mt-2">
+            {(["Critical", "High", "Moderate", "Low"] as const).map(u => (
+              <span key={u} className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ backgroundColor: gapColour(u) }} />{statusWord(u)}</span>
+            ))}
+          </div>
+          <p className="text-sm font-body text-foreground mt-2">
+            {gapChartData[0].name} is the most crowded: {ratioWords(gapChartData[0].ltr)}. {dnemisTotals.criticalLgas} LGAs are at critical shortage.
+          </p>
         </div>
         <div className="bg-card rounded-md p-4 shadow-sm">
           <h3 className="font-display font-semibold text-sm mb-3 text-card-foreground">Extra Teachers Needed to Reach 1:35 (Top 8 LGAs)</h3>
@@ -110,6 +119,9 @@ const OverviewTab = () => {
               <Bar dataKey="teachers" fill="hsl(var(--secondary))" radius={[0, 2, 2, 0]} />
             </BarChart>
           </ResponsiveContainer>
+          <p className="text-sm font-body text-foreground mt-2">
+            {topTeachers[0].name} needs the most extra teachers: about {topTeachers[0].teachers.toLocaleString()}. These 8 LGAs need about {topTeachers.reduce((n, r) => n + r.teachers, 0).toLocaleString()} between them.
+          </p>
         </div>
       </div>
     </div>

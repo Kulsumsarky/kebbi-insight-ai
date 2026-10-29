@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AlertTriangle, Sparkles } from "lucide-react";
 import { estimatedCoreGapsFromDnemis, DNEMIS_LTR_STANDARD, type DnemisLgaData } from "@/data/kebbiData";
 import { useYearData } from "@/hooks/useYear";
+import { statusWord } from "@/lib/wording";
 import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ExplainCard from "@/components/ExplainCard";
@@ -60,8 +61,8 @@ const AIPredictionsTab = () => {
         title="Highest Urgency LGAs: what this number means"
         description="DNEMIS Annual School Census 2024."
         rows={[
-          { label: "The number", value: String(criticalLgas.length), explain: `LGAs rated Critical because their learners-per-teacher ratio is far above the 1:${DNEMIS_LTR_STANDARD} standard.` },
-          { label: "Which ones", explain: criticalLgas.map(r => `${r.lga} (1:${r.ltr.toFixed(1)})`).join(", ") + "." },
+          { label: "The number", value: String(criticalLgas.length), explain: `LGAs rated Critical because their learners-per-teacher ratio is far above the standard of ${DNEMIS_LTR_STANDARD} learners for every teacher.` },
+          { label: "Which ones", explain: criticalLgas.map(r => `${r.lga} (${Math.round(r.ltr)} learners for every teacher)`).join(", ") + "." },
           { label: "How to use it", explain: "These LGAs come first in the recommendations below, because each new teacher makes the biggest difference there." },
         ]}
       >
@@ -72,7 +73,7 @@ const AIPredictionsTab = () => {
 
       <div className="bg-card rounded-md shadow-sm overflow-x-auto">
         <h3 className="font-display font-semibold text-sm p-4 pb-1 text-card-foreground">Recruitment Priority by Subject</h3>
-        <p className="text-xs text-muted-foreground font-body px-4 pb-3">Ranked most urgent first, by estimated teachers needed to reach the 1:35 standard.</p>
+        <p className="text-xs text-muted-foreground font-body px-4 pb-3">Ranked most urgent first, by estimated teachers needed to reach the standard of 35 learners for every teacher.</p>
         <table className="w-full text-sm font-body">
           <thead><tr className="bg-muted text-left">
             {['Priority', 'Subject', 'Est. Teachers Needed', 'Share of Shortfall', 'LGAs Affected'].map(label => <th key={label} className="px-4 py-3 font-display font-semibold">{label}</th>)}
@@ -98,8 +99,8 @@ const AIPredictionsTab = () => {
           <tbody>{interventions.map(({ row, gap }, index) => (
               <tr key={row.lga} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
                 <td className="px-4 py-3 font-semibold">{row.lga}<PilotBadge lga={row.lga} /></td>
-                <td className="px-4 py-3"><span className={`text-xs font-semibold px-2 py-1 rounded-full ${row.urgency === "Critical" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning"}`}>{row.urgency}</span></td>
-                <td className="px-4 py-3">Learner-teacher ratio 1:{Math.round(row.ltr)} vs 1:{DNEMIS_LTR_STANDARD} standard; {row.femaleTeachersPct}% female teachers</td>
+                <td className="px-4 py-3"><span className={`text-xs font-semibold px-2 py-1 rounded-full ${row.urgency === "Critical" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning"}`}>{statusWord(row.urgency)}</span></td>
+                <td className="px-4 py-3">{Math.round(row.ltr)} learners for every teacher (standard: {DNEMIS_LTR_STANDARD}); {row.femaleTeachersPct}% female teachers</td>
                 <td className="px-4 py-3 min-w-64">{actionFor(row)}</td>
                 <td className="px-4 py-3">{gap.toLocaleString()} (est.)</td>
                 <td className="px-4 py-3">{row.learners.toLocaleString()} learners</td>

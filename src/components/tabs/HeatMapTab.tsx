@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { DNEMIS_LTR_STANDARD } from "@/data/kebbiData";
 import { useYearData } from "@/hooks/useYear";
+import { statusWord } from "@/lib/wording";
 
 const tileColour = (urgency: string) => {
   if (urgency === "Critical") return "hsl(var(--destructive))";
@@ -27,14 +28,16 @@ const HeatMapTab = () => {
       <div>
         <h3 className="font-display font-semibold text-sm text-foreground">Learners per teacher, all 21 LGAs ({DATA_SOURCE_SHORT})</h3>
         <p className="text-xs text-muted-foreground font-body mt-1">
-          Tiles are ordered from the most learners per teacher (red) to the fewest (green). The national standard is 1:{DNEMIS_LTR_STANDARD}.
+          Tiles are ordered from the most learners per teacher (red) to the fewest (green). The national standard is {DNEMIS_LTR_STANDARD} learners for every teacher.
         </p>
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2">
         {rows.map(r => (
           <div key={r.lga} className="rounded-md p-3 text-center text-white" style={{ backgroundColor: tileColour(r.urgency) }}>
             <p className="text-[10px] font-display font-bold leading-tight">{r.lga}</p>
-            <p className="text-lg font-display font-bold">1:{Math.round(r.ltr)}</p>
+            <p className="text-lg font-display font-bold">{Math.round(r.ltr)}</p>
+            <p className="text-[9px] opacity-90">learners for every teacher</p>
+            <p className="text-[10px] font-display font-semibold">{statusWord(r.urgency)}</p>
             <p className="text-[9px] opacity-90">{perThousand(r)} per 1,000 learners</p>
             <p className="text-[9px] opacity-90">{r.teachers.toLocaleString()} teachers</p>
           </div>
@@ -56,6 +59,9 @@ const HeatMapTab = () => {
             <Bar dataKey="density" radius={[0, 2, 2, 0]}>{density.map(d => <Cell key={d.name} fill={tileColour(d.urgency)} />)}</Bar>
           </BarChart>
         </ResponsiveContainer>
+        <p className="text-sm font-body text-foreground mt-2">
+          {density[density.length - 1].name} has the fewest teachers for its learners: {density[density.length - 1].density} per 1,000. The standard is about {Math.round(1000 / DNEMIS_LTR_STANDARD)} per 1,000.
+        </p>
       </div>
     </div>
   );
