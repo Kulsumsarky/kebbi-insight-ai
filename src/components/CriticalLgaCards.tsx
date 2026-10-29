@@ -63,7 +63,12 @@ export const LgaDetailDialog = ({ row, onClose }: { row: DnemisLgaData | null; o
   );
 };
 
-const CriticalLgaCards = () => {
+interface CriticalLgaCardsProps {
+  /** When given, a card opens that LGA in Find my LGA instead of the pop-up. */
+  onSelectLga?: (lga: string) => void;
+}
+
+const CriticalLgaCards = ({ onSelectLga }: CriticalLgaCardsProps) => {
   const { lgas } = useYearData();
   const criticalLgas = lgas.filter((row) => row.urgency === "Critical");
   const [selected, setSelected] = useState<DnemisLgaData | null>(null);
@@ -74,14 +79,14 @@ const CriticalLgaCards = () => {
         <h3 id="critical-lgas-heading" className="font-display font-semibold text-sm text-card-foreground">
           The {criticalLgas.length} LGAs at critical shortage
         </h3>
-        <p className="text-xs text-muted-foreground font-body">Select a card to see what its numbers mean.</p>
+        <p className="text-xs text-muted-foreground font-body">Select a card to see that LGA in Find my LGA.</p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {criticalLgas.map((row) => (
           <button
             key={row.lga}
             type="button"
-            onClick={() => setSelected(row)}
+            onClick={() => (onSelectLga ? onSelectLga(row.lga) : setSelected(row))}
             className="text-left bg-card rounded-md p-4 shadow-sm border-l-4 border-l-destructive transition-all duration-200 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <p className="text-xs text-muted-foreground font-body uppercase tracking-wide">{row.lga}</p>

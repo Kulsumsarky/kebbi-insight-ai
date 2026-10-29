@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { DNEMIS_LTR_STANDARD, DNEMIS_NOTE } from "@/data/kebbiData";
 import { useYearData } from "@/hooks/useYear";
@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, Scale } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import CriticalLgaCards from "@/components/CriticalLgaCards";
 import ExplainCard from "@/components/ExplainCard";
+import FindMyLga from "@/components/FindMyLga";
 
 const gapColour = (urgency: string) => {
   if (urgency === "Critical") return "hsl(var(--destructive))";
@@ -35,6 +36,14 @@ const MetricCard = ({ title, value, note, border, explain }: { title: string; va
 const OverviewTab = () => {
   const { lgas: dnemisLgaData, totals: dnemisTotals, statewideDeployment, sourceShort: DATA_SOURCE_SHORT } = useYearData();
   const [dnemisOpen, setDnemisOpen] = useState(false);
+  const [selectedLga, setSelectedLga] = useState(
+    () => [...dnemisLgaData].sort((a, b) => b.ltr - a.ltr)[0].lga,
+  );
+  const findRef = useRef<HTMLDivElement>(null);
+  const openLga = (name: string) => {
+    setSelectedLga(name);
+    findRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   const gapChartData = [...dnemisLgaData].sort((a, b) => b.ltr - a.ltr).map(lga => ({ name: lga.lga, ltr: lga.ltr, urgency: lga.urgency }));
   const topTeachers = [...dnemisLgaData]
     .map(lga => ({ name: lga.lga, teachers: Math.max(0, Math.ceil(lga.learners / DNEMIS_LTR_STANDARD) - lga.teachers) }))
@@ -44,6 +53,9 @@ const OverviewTab = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <div ref={findRef} className="scroll-mt-16">
+        <FindMyLga lga={selectedLga} onChange={setSelectedLga} />
+      </div>
       <p className="text-sm font-body text-foreground bg-card rounded-md p-4 shadow-sm border-l-4 border-l-primary">
         {above} of {dnemisLgaData.length} LGAs have more than {DNEMIS_LTR_STANDARD} learners per teacher. {dnemisTotals.criticalLgas} are at critical shortage.
       </p>
@@ -66,7 +78,7 @@ const OverviewTab = () => {
         ]} />
       </div>
 
-      <CriticalLgaCards />
+      <CriticalLgaCards onSelectLga={openLga} />
 
       <div className="bg-card rounded-md shadow-sm border-l-4 border-l-accent">
         <button onClick={() => setDnemisOpen(!dnemisOpen)} className="w-full flex items-center justify-between gap-2 p-4 text-left hover:bg-muted/50 transition-colors">
