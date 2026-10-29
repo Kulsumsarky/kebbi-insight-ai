@@ -1,10 +1,8 @@
 import PilotBadge from "@/components/PilotBadge";
 import { AlertTriangle } from "lucide-react";
-import { deploymentByLga, statewideDeployment } from "@/data/kebbiData";
+import { useYearData } from "@/hooks/useYear";
 import ExplainCard from "@/components/ExplainCard";
 import PendingBadge from "@/components/PendingBadge";
-
-const percent = (value: number) => Math.round((value / statewideDeployment.total) * 100);
 
 const statusFor = (classroomPercent: number) => {
   if (classroomPercent > 85) return { label: "Strong", className: "bg-secondary/15 text-secondary" };
@@ -18,7 +16,10 @@ const deploymentMeaning: Record<string, string> = {
   "Not yet verified": "Teachers whose posting cannot yet be confirmed from the data. Checking these records is the first step before any redeployment.",
 };
 
-const DeploymentTab = () => (
+const DeploymentTab = () => {
+  const { deployment: deploymentByLga, statewideDeployment } = useYearData();
+  const percent = (value: number) => Math.round((value / statewideDeployment.total) * 100);
+  return (
   <div className="space-y-5 animate-fade-in">
     <div className="bg-accent/15 border border-accent/40 rounded-md p-4 flex items-start gap-3">
       <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
@@ -90,6 +91,7 @@ const DeploymentTab = () => (
       Estimate method: reported LGA totals are allocated using a stable 8–12% administrative rate and a 4–8% verification allowance adjusted by shortage severity.
     </p>
   </div>
-);
+  );
+};
 
 export default DeploymentTab;

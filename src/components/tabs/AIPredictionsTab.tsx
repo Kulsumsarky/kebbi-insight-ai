@@ -1,37 +1,39 @@
 import PilotBadge from "@/components/PilotBadge";
 import { useState } from "react";
 import { AlertTriangle, Sparkles } from "lucide-react";
-import { dnemisLgaData, estimatedCoreGapsFromDnemis, DNEMIS_LTR_STANDARD } from "@/data/kebbiData";
+import { estimatedCoreGapsFromDnemis, DNEMIS_LTR_STANDARD, type DnemisLgaData } from "@/data/kebbiData";
+import { useYearData } from "@/hooks/useYear";
 import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ExplainCard from "@/components/ExplainCard";
 import { PUBLIC_DEMO_MODE } from "@/config";
 
-const criticalLgas = dnemisLgaData.filter(row => row.urgency === "Critical");
-const aggregateGap = (r: (typeof dnemisLgaData)[number]) => { const g = estimatedCoreGapsFromDnemis(r); return g.maths + g.english + g.science; };
-const actionFor = (r: (typeof dnemisLgaData)[number]) => {
+const aggregateGap = (r: DnemisLgaData) => { const g = estimatedCoreGapsFromDnemis(r); return g.maths + g.english + g.science; };
+const actionFor = (r: DnemisLgaData) => {
   if (r.femaleTeachersPct < 25) return "Prioritise recruitment with targeted female teacher intake to support girls' enrolment";
   if (r.urgency === "Critical") return "Emergency recruitment and rural posting incentives for core subjects";
   return "Rebalance postings from over-served schools and recruit for Maths, English and Science";
 };
-const interventions = dnemisLgaData
-  .filter(r => r.urgency === "Critical" || r.urgency === "High")
-  .sort((a, b) => b.ltr - a.ltr)
-  .map(r => ({ row: r, gap: aggregateGap(r) }));
-
-const subjectTotals = dnemisLgaData.reduce(
-  (acc, row) => { const g = estimatedCoreGapsFromDnemis(row); acc.Mathematics += g.maths; acc.English += g.english; acc.Science += g.science; return acc; },
-  { Mathematics: 0, English: 0, Science: 0 } as Record<string, number>,
-);
-const subjectLgaCounts = (key: "maths" | "english" | "science") => dnemisLgaData.filter(r => estimatedCoreGapsFromDnemis(r)[key] > 0).length;
-const subjectKeys: Record<string, "maths" | "english" | "science"> = { Mathematics: "maths", English: "english", Science: "science" };
-const recruitmentPriority = Object.entries(subjectTotals)
-  .map(([subject, gap]) => ({ subject, gap, lgas: subjectLgaCounts(subjectKeys[subject]) }))
-  .sort((a, b) => b.gap - a.gap);
-const totalSubjectGap = recruitmentPriority.reduce((s, r) => s + r.gap, 0);
 
 const AIPredictionsTab = () => {
+  const { lgas: dnemisLgaData } = useYearData();
   const [showModal, setShowModal] = useState(false);
+  const criticalLgas = dnemisLgaData.filter(row => row.urgency === "Critical");
+  const interventions = dnemisLgaData
+    .filter(r => r.urgency === "Critical" || r.urgency === "High")
+    .sort((a, b) => b.ltr - a.ltr)
+    .map(r => ({ row: r, gap: aggregateGap(r) }));
+
+  const subjectTotals = dnemisLgaData.reduce(
+    (acc, row) => { const g = estimatedCoreGapsFromDnemis(row); acc.Mathematics += g.maths; acc.English += g.english; acc.Science += g.science; return acc; },
+    { Mathematics: 0, English: 0, Science: 0 } as Record<string, number>,
+  );
+  const subjectLgaCounts = (key: "maths" | "english" | "science") => dnemisLgaData.filter(r => estimatedCoreGapsFromDnemis(r)[key] > 0).length;
+  const subjectKeys: Record<string, "maths" | "english" | "science"> = { Mathematics: "maths", English: "english", Science: "science" };
+  const recruitmentPriority = Object.entries(subjectTotals)
+    .map(([subject, gap]) => ({ subject, gap, lgas: subjectLgaCounts(subjectKeys[subject]) }))
+    .sort((a, b) => b.gap - a.gap);
+  const totalSubjectGap = recruitmentPriority.reduce((s, r) => s + r.gap, 0);
 
   return (
     <div className="space-y-6 animate-fade-in">

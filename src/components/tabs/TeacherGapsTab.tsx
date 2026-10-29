@@ -1,37 +1,8 @@
 import PilotBadge from "@/components/PilotBadge";
 import { AlertTriangle } from "lucide-react";
 import ExplainCard from "@/components/ExplainCard";
-import {
-  dnemisLgaData, dnemisTotals, DNEMIS_LTR_STANDARD, estimatedCoreGapsFromDnemis,
-} from "@/data/kebbiData";
-
-const stateLtr = dnemisTotals.learners / dnemisTotals.teachers;
-const aboveStandard = dnemisLgaData.filter(r => r.ltr > DNEMIS_LTR_STANDARD).length;
-const subjectSum = (k: "maths" | "english" | "science") => dnemisLgaData.reduce((n, r) => n + estimatedCoreGapsFromDnemis(r)[k], 0);
-
-const summaryCards = [
-  {
-    label: "Extra teachers needed (est.)", value: dnemisTotals.subjectGaps.toLocaleString(), border: "border-l-warning",
-    rows: [
-      { label: "The number", value: `${dnemisTotals.subjectGaps.toLocaleString()} (est.)`, explain: `Added up across all LGAs: the teachers needed to reach 1:${DNEMIS_LTR_STANDARD}, minus the teachers already in place.` },
-      { label: "Split by subject (est.)", explain: `Maths ${subjectSum("maths").toLocaleString()}, English ${subjectSum("english").toLocaleString()}, Science ${subjectSum("science").toLocaleString()}. The census has no subject data, so EduMap splits the total 36%, 34% and 30%.` },
-    ],
-  },
-  {
-    label: "State learners per teacher", value: `1:${stateLtr.toFixed(1)}`, border: "border-l-destructive",
-    rows: [
-      { label: "The number", value: `1:${stateLtr.toFixed(1)}`, explain: `${dnemisTotals.learners.toLocaleString()} learners divided by ${dnemisTotals.teachers.toLocaleString()} teachers across Kebbi State.` },
-      { label: "Compared with the standard", explain: `The Kebbi UBE standard is 1:${DNEMIS_LTR_STANDARD}. A state average can hide LGAs that are far worse, which is why the table below is by LGA.` },
-    ],
-  },
-  {
-    label: "LGAs above the standard", value: `${aboveStandard} of ${dnemisLgaData.length}`, border: "border-l-accent",
-    rows: [
-      { label: "The number", value: `${aboveStandard} of ${dnemisLgaData.length}`, explain: `LGAs where learners per teacher is higher than 1:${DNEMIS_LTR_STANDARD}.` },
-      { label: "What it means", explain: "In these LGAs there are more learners for each teacher than the standard allows, so classes are likely larger than planned." },
-    ],
-  },
-];
+import { DNEMIS_LTR_STANDARD, estimatedCoreGapsFromDnemis } from "@/data/kebbiData";
+import { useYearData } from "@/hooks/useYear";
 
 const urgencyClass = {
   Low: "bg-secondary/15 text-secondary",
@@ -40,7 +11,36 @@ const urgencyClass = {
   Critical: "bg-destructive/10 text-destructive",
 };
 
-const TeacherGapsTab = () => (
+const TeacherGapsTab = () => {
+  const { lgas: dnemisLgaData, totals: dnemisTotals } = useYearData();
+  const stateLtr = dnemisTotals.learners / dnemisTotals.teachers;
+  const aboveStandard = dnemisLgaData.filter(r => r.ltr > DNEMIS_LTR_STANDARD).length;
+  const subjectSum = (k: "maths" | "english" | "science") => dnemisLgaData.reduce((n, r) => n + estimatedCoreGapsFromDnemis(r)[k], 0);
+
+  const summaryCards = [
+    {
+      label: "Extra teachers needed (est.)", value: dnemisTotals.subjectGaps.toLocaleString(), border: "border-l-warning",
+      rows: [
+        { label: "The number", value: `${dnemisTotals.subjectGaps.toLocaleString()} (est.)`, explain: `Added up across all LGAs: the teachers needed to reach 1:${DNEMIS_LTR_STANDARD}, minus the teachers already in place.` },
+        { label: "Split by subject (est.)", explain: `Maths ${subjectSum("maths").toLocaleString()}, English ${subjectSum("english").toLocaleString()}, Science ${subjectSum("science").toLocaleString()}. The census has no subject data, so EduMap splits the total 36%, 34% and 30%.` },
+      ],
+    },
+    {
+      label: "State learners per teacher", value: `1:${stateLtr.toFixed(1)}`, border: "border-l-destructive",
+      rows: [
+        { label: "The number", value: `1:${stateLtr.toFixed(1)}`, explain: `${dnemisTotals.learners.toLocaleString()} learners divided by ${dnemisTotals.teachers.toLocaleString()} teachers across Kebbi State.` },
+        { label: "Compared with the standard", explain: `The Kebbi UBE standard is 1:${DNEMIS_LTR_STANDARD}. A state average can hide LGAs that are far worse, which is why the table below is by LGA.` },
+      ],
+    },
+    {
+      label: "LGAs above the standard", value: `${aboveStandard} of ${dnemisLgaData.length}`, border: "border-l-accent",
+      rows: [
+        { label: "The number", value: `${aboveStandard} of ${dnemisLgaData.length}`, explain: `LGAs where learners per teacher is higher than 1:${DNEMIS_LTR_STANDARD}.` },
+        { label: "What it means", explain: "In these LGAs there are more learners for each teacher than the standard allows, so classes are likely larger than planned." },
+      ],
+    },
+  ];
+  return (
   <div className="space-y-5 animate-fade-in">
     <div className="bg-accent/15 border border-accent/40 rounded-md p-4 flex items-start gap-3">
       <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
@@ -101,6 +101,7 @@ const TeacherGapsTab = () => (
       Subject-gap estimate only: additional teachers needed to reach the Kebbi UBE standard of 1:{DNEMIS_LTR_STANDARD} are allocated 36% to Maths, 34% to English and 30% to Science. DNEMIS does not publish subject-level staffing in this dataset.
     </p>
   </div>
-);
+  );
+};
 
 export default TeacherGapsTab;

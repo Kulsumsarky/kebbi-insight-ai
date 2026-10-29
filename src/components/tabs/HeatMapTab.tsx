@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { dnemisLgaData, DNEMIS_LTR_STANDARD, DATA_SOURCE_SHORT } from "@/data/kebbiData";
+import { DNEMIS_LTR_STANDARD } from "@/data/kebbiData";
+import { useYearData } from "@/hooks/useYear";
 
 const tileColour = (urgency: string) => {
   if (urgency === "Critical") return "hsl(var(--destructive))";
@@ -18,6 +19,7 @@ const legend = [
 ] as const;
 
 const HeatMapTab = () => {
+  const { lgas: dnemisLgaData, sourceShort: DATA_SOURCE_SHORT } = useYearData();
   const rows = [...dnemisLgaData].sort((a, b) => b.ltr - a.ltr);
   const density = dnemisLgaData.map(r => ({ name: r.lga, density: perThousand(r), urgency: r.urgency })).sort((a, b) => b.density - a.density);
   return (

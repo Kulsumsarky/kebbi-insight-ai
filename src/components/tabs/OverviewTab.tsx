@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import {
-  dnemisLgaData, dnemisTotals, DNEMIS_LTR_STANDARD, DNEMIS_NOTE, DATA_SOURCE_SHORT, statewideDeployment,
-} from "@/data/kebbiData";
+import { DNEMIS_LTR_STANDARD, DNEMIS_NOTE } from "@/data/kebbiData";
+import { useYearData } from "@/hooks/useYear";
 import { ChevronDown, ChevronUp, Scale } from "lucide-react";
 import { useCountUp } from "@/hooks/useCountUp";
 import CriticalLgaCards from "@/components/CriticalLgaCards";
@@ -34,6 +33,7 @@ const MetricCard = ({ title, value, note, border, explain }: { title: string; va
 };
 
 const OverviewTab = () => {
+  const { lgas: dnemisLgaData, totals: dnemisTotals, statewideDeployment, sourceShort: DATA_SOURCE_SHORT } = useYearData();
   const [dnemisOpen, setDnemisOpen] = useState(false);
   const gapChartData = [...dnemisLgaData].sort((a, b) => b.ltr - a.ltr).map(lga => ({ name: lga.lga, ltr: lga.ltr, urgency: lga.urgency }));
   const topTeachers = [...dnemisLgaData]

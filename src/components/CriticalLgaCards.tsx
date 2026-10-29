@@ -1,12 +1,9 @@
 import { useState } from "react";
-import {
-  dnemisLgaData, DNEMIS_LTR_STANDARD, DATA_SOURCE_SHORT, type DnemisLgaData,
-} from "@/data/kebbiData";
+import { DNEMIS_LTR_STANDARD, type DnemisLgaData } from "@/data/kebbiData";
+import { useYearData } from "@/hooks/useYear";
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-
-const criticalLgas = dnemisLgaData.filter((row) => row.urgency === "Critical");
 
 const fmt = (n: number) => n.toLocaleString();
 
@@ -26,7 +23,9 @@ const Row = ({ label, value, explain }: { label: string; value: string; explain:
 
 
 /** Plain-language explanation of one LGA's census figures. */
-export const LgaDetailDialog = ({ row, onClose }: { row: DnemisLgaData | null; onClose: () => void }) => (
+export const LgaDetailDialog = ({ row, onClose }: { row: DnemisLgaData | null; onClose: () => void }) => {
+  const { sourceShort: DATA_SOURCE_SHORT } = useYearData();
+  return (
   <Dialog open={row !== null} onOpenChange={(open) => !open && onClose()}>
     <DialogContent className="max-h-[90vh] overflow-y-auto">
       {row && (
@@ -61,9 +60,12 @@ export const LgaDetailDialog = ({ row, onClose }: { row: DnemisLgaData | null; o
       )}
     </DialogContent>
   </Dialog>
-);
+  );
+};
 
 const CriticalLgaCards = () => {
+  const { lgas } = useYearData();
+  const criticalLgas = lgas.filter((row) => row.urgency === "Critical");
   const [selected, setSelected] = useState<DnemisLgaData | null>(null);
 
   return (
