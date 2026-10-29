@@ -1,37 +1,41 @@
 import PilotBadge from "@/components/PilotBadge";
+import RowCard from "@/components/RowCard";
 import { useState } from "react";
 import { AlertTriangle, Sparkles } from "lucide-react";
-import { dnemisLgaData, estimatedCoreGapsFromDnemis, DNEMIS_LTR_STANDARD } from "@/data/kebbiData";
+import { estimatedCoreGapsFromDnemis, DNEMIS_LTR_STANDARD, type DnemisLgaData } from "@/data/kebbiData";
+import { useYearData } from "@/hooks/useYear";
+import { statusWord } from "@/lib/wording";
 import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ExplainCard from "@/components/ExplainCard";
 import { PUBLIC_DEMO_MODE } from "@/config";
 
-const criticalLgas = dnemisLgaData.filter(row => row.urgency === "Critical");
-const aggregateGap = (r: (typeof dnemisLgaData)[number]) => { const g = estimatedCoreGapsFromDnemis(r); return g.maths + g.english + g.science; };
-const actionFor = (r: (typeof dnemisLgaData)[number]) => {
+const aggregateGap = (r: DnemisLgaData) => { const g = estimatedCoreGapsFromDnemis(r); return g.maths + g.english + g.science; };
+const actionFor = (r: DnemisLgaData) => {
   if (r.femaleTeachersPct < 25) return "Prioritise recruitment with targeted female teacher intake to support girls' enrolment";
   if (r.urgency === "Critical") return "Emergency recruitment and rural posting incentives for core subjects";
   return "Rebalance postings from over-served schools and recruit for Maths, English and Science";
 };
-const interventions = dnemisLgaData
-  .filter(r => r.urgency === "Critical" || r.urgency === "High")
-  .sort((a, b) => b.ltr - a.ltr)
-  .map(r => ({ row: r, gap: aggregateGap(r) }));
-
-const subjectTotals = dnemisLgaData.reduce(
-  (acc, row) => { const g = estimatedCoreGapsFromDnemis(row); acc.Mathematics += g.maths; acc.English += g.english; acc.Science += g.science; return acc; },
-  { Mathematics: 0, English: 0, Science: 0 } as Record<string, number>,
-);
-const subjectLgaCounts = (key: "maths" | "english" | "science") => dnemisLgaData.filter(r => estimatedCoreGapsFromDnemis(r)[key] > 0).length;
-const subjectKeys: Record<string, "maths" | "english" | "science"> = { Mathematics: "maths", English: "english", Science: "science" };
-const recruitmentPriority = Object.entries(subjectTotals)
-  .map(([subject, gap]) => ({ subject, gap, lgas: subjectLgaCounts(subjectKeys[subject]) }))
-  .sort((a, b) => b.gap - a.gap);
-const totalSubjectGap = recruitmentPriority.reduce((s, r) => s + r.gap, 0);
 
 const AIPredictionsTab = () => {
+  const { lgas: dnemisLgaData } = useYearData();
   const [showModal, setShowModal] = useState(false);
+  const criticalLgas = dnemisLgaData.filter(row => row.urgency === "Critical");
+  const interventions = dnemisLgaData
+    .filter(r => r.urgency === "Critical" || r.urgency === "High")
+    .sort((a, b) => b.ltr - a.ltr)
+    .map(r => ({ row: r, gap: aggregateGap(r) }));
+
+  const subjectTotals = dnemisLgaData.reduce(
+    (acc, row) => { const g = estimatedCoreGapsFromDnemis(row); acc.Mathematics += g.maths; acc.English += g.english; acc.Science += g.science; return acc; },
+    { Mathematics: 0, English: 0, Science: 0 } as Record<string, number>,
+  );
+  const subjectLgaCounts = (key: "maths" | "english" | "science") => dnemisLgaData.filter(r => estimatedCoreGapsFromDnemis(r)[key] > 0).length;
+  const subjectKeys: Record<string, "maths" | "english" | "science"> = { Mathematics: "maths", English: "english", Science: "science" };
+  const recruitmentPriority = Object.entries(subjectTotals)
+    .map(([subject, gap]) => ({ subject, gap, lgas: subjectLgaCounts(subjectKeys[subject]) }))
+    .sort((a, b) => b.gap - a.gap);
+  const totalSubjectGap = recruitmentPriority.reduce((s, r) => s + r.gap, 0);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -58,8 +62,8 @@ const AIPredictionsTab = () => {
         title="Highest Urgency LGAs: what this number means"
         description="DNEMIS Annual School Census 2024."
         rows={[
-          { label: "The number", value: String(criticalLgas.length), explain: `LGAs rated Critical because their learners-per-teacher ratio is far above the 1:${DNEMIS_LTR_STANDARD} standard.` },
-          { label: "Which ones", explain: criticalLgas.map(r => `${r.lga} (1:${r.ltr.toFixed(1)})`).join(", ") + "." },
+          { label: "The number", value: String(criticalLgas.length), explain: `LGAs rated Critical because their learners-per-teacher ratio is far above the standard of ${DNEMIS_LTR_STANDARD} learners for every teacher.` },
+          { label: "Which ones", explain: criticalLgas.map(r => `${r.lga} (${Math.round(r.ltr)} learners for every teacher)`).join(", ") + "." },
           { label: "How to use it", explain: "These LGAs come first in the recommendations below, because each new teacher makes the biggest difference there." },
         ]}
       >
@@ -68,9 +72,25 @@ const AIPredictionsTab = () => {
         <p className="text-xs text-muted-foreground font-body mt-1">LGAs rated Critical in the DNEMIS 2024 census</p>
       </ExplainCard>
 
-      <div className="bg-card rounded-md shadow-sm overflow-x-auto">
+      <div className="sm:hidden space-y-3">
+        <h3 className="font-display font-semibold text-sm text-card-foreground">Recruitment Priority by Subject</h3>
+        {recruitmentPriority.map((row, index) => (
+          <RowCard
+            key={row.subject}
+            title={row.subject}
+            badges={<span className={`text-xs font-semibold px-2 py-1 rounded-full ${index === 0 ? "bg-destructive/10 text-destructive" : index === 1 ? "bg-warning/15 text-warning" : "bg-accent/15 text-foreground"}`}>#{index + 1}</span>}
+            rows={[
+              { label: "Est. teachers needed", value: `${row.gap.toLocaleString()} (est.)` },
+              { label: "Share of shortfall", value: `${totalSubjectGap ? Math.round((row.gap / totalSubjectGap) * 100) : 0}%` },
+              { label: "LGAs affected", value: `${row.lgas} of 21` },
+            ]}
+          />
+        ))}
+      </div>
+
+      <div className="hidden sm:block bg-card rounded-md shadow-sm overflow-x-auto">
         <h3 className="font-display font-semibold text-sm p-4 pb-1 text-card-foreground">Recruitment Priority by Subject</h3>
-        <p className="text-xs text-muted-foreground font-body px-4 pb-3">Ranked most urgent first, by estimated teachers needed to reach the 1:35 standard.</p>
+        <p className="text-xs text-muted-foreground font-body px-4 pb-3">Ranked most urgent first, by estimated teachers needed to reach the standard of 35 learners for every teacher.</p>
         <table className="w-full text-sm font-body">
           <thead><tr className="bg-muted text-left">
             {['Priority', 'Subject', 'Est. Teachers Needed', 'Share of Shortfall', 'LGAs Affected'].map(label => <th key={label} className="px-4 py-3 font-display font-semibold">{label}</th>)}
@@ -87,7 +107,24 @@ const AIPredictionsTab = () => {
         </table>
       </div>
 
-      <div className="bg-card rounded-md shadow-sm overflow-x-auto">
+      <div className="sm:hidden space-y-3">
+        <h3 className="font-display font-semibold text-sm text-card-foreground">Intervention Recommendations</h3>
+        {interventions.map(({ row, gap }) => (
+          <RowCard
+            key={row.lga}
+            title={<>{row.lga}<PilotBadge lga={row.lga} /></>}
+            badges={<span className={`text-xs font-semibold px-2 py-1 rounded-full ${row.urgency === "Critical" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning"}`}>{statusWord(row.urgency)}</span>}
+            rows={[
+              { label: "Gap type", value: `${Math.round(row.ltr)} learners for every teacher (standard: ${DNEMIS_LTR_STANDARD}); ${row.femaleTeachersPct}% female teachers`, wide: true },
+              { label: "Recommended action", value: actionFor(row), wide: true },
+              { label: "Est. teachers needed", value: `${gap.toLocaleString()} (est.)` },
+              { label: "Students affected", value: `${row.learners.toLocaleString()} learners` },
+            ]}
+          />
+        ))}
+      </div>
+
+      <div className="hidden sm:block bg-card rounded-md shadow-sm overflow-x-auto">
         <h3 className="font-display font-semibold text-sm p-4 pb-2 text-card-foreground">Intervention Recommendations</h3>
         <table className="w-full text-sm font-body">
           <thead><tr className="bg-muted text-left">
@@ -96,8 +133,8 @@ const AIPredictionsTab = () => {
           <tbody>{interventions.map(({ row, gap }, index) => (
               <tr key={row.lga} className={index % 2 === 0 ? "bg-card" : "bg-muted/30"}>
                 <td className="px-4 py-3 font-semibold">{row.lga}<PilotBadge lga={row.lga} /></td>
-                <td className="px-4 py-3"><span className={`text-xs font-semibold px-2 py-1 rounded-full ${row.urgency === "Critical" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning"}`}>{row.urgency}</span></td>
-                <td className="px-4 py-3">Learner-teacher ratio 1:{Math.round(row.ltr)} vs 1:{DNEMIS_LTR_STANDARD} standard; {row.femaleTeachersPct}% female teachers</td>
+                <td className="px-4 py-3"><span className={`text-xs font-semibold px-2 py-1 rounded-full ${row.urgency === "Critical" ? "bg-destructive/10 text-destructive" : "bg-warning/15 text-warning"}`}>{statusWord(row.urgency)}</span></td>
+                <td className="px-4 py-3">{Math.round(row.ltr)} learners for every teacher (standard: {DNEMIS_LTR_STANDARD}); {row.femaleTeachersPct}% female teachers</td>
                 <td className="px-4 py-3 min-w-64">{actionFor(row)}</td>
                 <td className="px-4 py-3">{gap.toLocaleString()} (est.)</td>
                 <td className="px-4 py-3">{row.learners.toLocaleString()} learners</td>

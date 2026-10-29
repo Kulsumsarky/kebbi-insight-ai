@@ -39,7 +39,7 @@ const problemPoints = [
 const pilotLgas = ["Birnin Kebbi", "Kalgo", "Argungu", "Gwandu", "Aliero"];
 
 const faqs = [
-  { q: "What is EduMap NG?", a: "A platform that turns school-level teacher data into clear evidence for planning and posting decisions in Kebbi State." },
+  { q: "What is EduMap?", a: "A platform that turns school-level teacher data into clear evidence for planning and posting decisions in Kebbi State." },
   { q: "Where does the data come from?", a: "It is built on DNEMIS data, and school-level records collected with local government education authorities." },
   {
     q: "Who can see it?",
@@ -243,7 +243,7 @@ const Landing = () => (
               <span className="text-primary">LGA by LGA.</span>
             </h2>
             <p className="text-muted-foreground font-body text-base md:text-lg max-w-lg mb-5">
-              EduMap NG turns school-level teacher data into clear, current evidence for planning and
+              EduMap turns school-level teacher data into clear, current evidence for planning and
               posting decisions in Kebbi State.
             </p>
             <p className="font-display font-semibold text-foreground text-sm mb-6">
@@ -290,7 +290,7 @@ const Landing = () => (
           Teacher gaps are hard to see without current school-level data
         </h2>
         <p className="text-muted-foreground font-body max-w-2xl mb-8">
-          Planning and posting decisions are only as good as the evidence behind them. EduMap NG brings it into one place.
+          Planning and posting decisions are only as good as the evidence behind them. EduMap brings it into one place.
         </p>
         <div className="grid gap-6 md:grid-cols-3">
           {problemPoints.map(({ icon: Icon, title }) => (
@@ -304,7 +304,7 @@ const Landing = () => (
 
       {/* What EduMap does */}
       <section id="how-it-works" className="container py-12 md:py-16 scroll-mt-20">
-        <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-8">What EduMap NG does</h2>
+        <h2 className="font-display font-bold text-2xl md:text-3xl text-foreground mb-8">What EduMap does</h2>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {whatItDoes.map(({ icon: Icon, title, text }) => (
             <div key={title} className="group">

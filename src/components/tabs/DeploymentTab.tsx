@@ -1,10 +1,9 @@
 import PilotBadge from "@/components/PilotBadge";
+import RowCard from "@/components/RowCard";
 import { AlertTriangle } from "lucide-react";
-import { deploymentByLga, statewideDeployment } from "@/data/kebbiData";
+import { useYearData } from "@/hooks/useYear";
 import ExplainCard from "@/components/ExplainCard";
 import PendingBadge from "@/components/PendingBadge";
-
-const percent = (value: number) => Math.round((value / statewideDeployment.total) * 100);
 
 const statusFor = (classroomPercent: number) => {
   if (classroomPercent > 85) return { label: "Strong", className: "bg-secondary/15 text-secondary" };
@@ -18,7 +17,10 @@ const deploymentMeaning: Record<string, string> = {
   "Not yet verified": "Teachers whose posting cannot yet be confirmed from the data. Checking these records is the first step before any redeployment.",
 };
 
-const DeploymentTab = () => (
+const DeploymentTab = () => {
+  const { deployment: deploymentByLga, statewideDeployment } = useYearData();
+  const percent = (value: number) => Math.round((value / statewideDeployment.total) * 100);
+  return (
   <div className="space-y-5 animate-fade-in">
     <div className="bg-accent/15 border border-accent/40 rounded-md p-4 flex items-start gap-3">
       <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
@@ -51,7 +53,29 @@ const DeploymentTab = () => (
       ))}
     </div>
 
-    <div className="bg-card rounded-md shadow-sm overflow-x-auto">
+    <div className="sm:hidden space-y-3">
+      {deploymentByLga.map(row => {
+        const status = row.classroomPercent === null ? null : statusFor(row.classroomPercent);
+        const est = (n: number | null) => (n === null ? <PendingBadge /> : <>{n.toLocaleString()} <span className="text-xs text-muted-foreground">(est.)</span></>);
+        return (
+          <RowCard
+            key={row.lga}
+            title={<>{row.lga}<PilotBadge lga={row.lga} /></>}
+            badges={status && row.classroomPercent !== null ? (
+              <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${status.className}`}>{status.label} · {row.classroomPercent}%</span>
+            ) : <PendingBadge />}
+            rows={[
+              { label: "Total deployed", value: row.total === null ? <PendingBadge /> : row.total.toLocaleString() },
+              { label: "In classroom", value: est(row.classroom) },
+              { label: "In admin office", value: est(row.admin) },
+              { label: "Unverified", value: est(row.unverified) },
+            ]}
+          />
+        );
+      })}
+    </div>
+
+    <div className="hidden sm:block bg-card rounded-md shadow-sm overflow-x-auto">
       <table className="w-full text-sm font-body">
         <thead>
           <tr className="bg-muted text-left">
@@ -90,6 +114,7 @@ const DeploymentTab = () => (
       Estimate method: reported LGA totals are allocated using a stable 8–12% administrative rate and a 4–8% verification allowance adjusted by shortage severity.
     </p>
   </div>
-);
+  );
+};
 
 export default DeploymentTab;

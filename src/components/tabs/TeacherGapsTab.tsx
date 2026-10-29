@@ -1,37 +1,10 @@
 import PilotBadge from "@/components/PilotBadge";
+import RowCard from "@/components/RowCard";
 import { AlertTriangle } from "lucide-react";
 import ExplainCard from "@/components/ExplainCard";
-import {
-  dnemisLgaData, dnemisTotals, DNEMIS_LTR_STANDARD, estimatedCoreGapsFromDnemis,
-} from "@/data/kebbiData";
-
-const stateLtr = dnemisTotals.learners / dnemisTotals.teachers;
-const aboveStandard = dnemisLgaData.filter(r => r.ltr > DNEMIS_LTR_STANDARD).length;
-const subjectSum = (k: "maths" | "english" | "science") => dnemisLgaData.reduce((n, r) => n + estimatedCoreGapsFromDnemis(r)[k], 0);
-
-const summaryCards = [
-  {
-    label: "Extra teachers needed (est.)", value: dnemisTotals.subjectGaps.toLocaleString(), border: "border-l-warning",
-    rows: [
-      { label: "The number", value: `${dnemisTotals.subjectGaps.toLocaleString()} (est.)`, explain: `Added up across all LGAs: the teachers needed to reach 1:${DNEMIS_LTR_STANDARD}, minus the teachers already in place.` },
-      { label: "Split by subject (est.)", explain: `Maths ${subjectSum("maths").toLocaleString()}, English ${subjectSum("english").toLocaleString()}, Science ${subjectSum("science").toLocaleString()}. The census has no subject data, so EduMap splits the total 36%, 34% and 30%.` },
-    ],
-  },
-  {
-    label: "State learners per teacher", value: `1:${stateLtr.toFixed(1)}`, border: "border-l-destructive",
-    rows: [
-      { label: "The number", value: `1:${stateLtr.toFixed(1)}`, explain: `${dnemisTotals.learners.toLocaleString()} learners divided by ${dnemisTotals.teachers.toLocaleString()} teachers across Kebbi State.` },
-      { label: "Compared with the standard", explain: `The Kebbi UBE standard is 1:${DNEMIS_LTR_STANDARD}. A state average can hide LGAs that are far worse, which is why the table below is by LGA.` },
-    ],
-  },
-  {
-    label: "LGAs above the standard", value: `${aboveStandard} of ${dnemisLgaData.length}`, border: "border-l-accent",
-    rows: [
-      { label: "The number", value: `${aboveStandard} of ${dnemisLgaData.length}`, explain: `LGAs where learners per teacher is higher than 1:${DNEMIS_LTR_STANDARD}.` },
-      { label: "What it means", explain: "In these LGAs there are more learners for each teacher than the standard allows, so classes are likely larger than planned." },
-    ],
-  },
-];
+import { DNEMIS_LTR_STANDARD, estimatedCoreGapsFromDnemis } from "@/data/kebbiData";
+import { useYearData } from "@/hooks/useYear";
+import { ratioWords, statusWord } from "@/lib/wording";
 
 const urgencyClass = {
   Low: "bg-secondary/15 text-secondary",
@@ -40,7 +13,36 @@ const urgencyClass = {
   Critical: "bg-destructive/10 text-destructive",
 };
 
-const TeacherGapsTab = () => (
+const TeacherGapsTab = () => {
+  const { lgas: dnemisLgaData, totals: dnemisTotals } = useYearData();
+  const stateLtr = dnemisTotals.learners / dnemisTotals.teachers;
+  const aboveStandard = dnemisLgaData.filter(r => r.ltr > DNEMIS_LTR_STANDARD).length;
+  const subjectSum = (k: "maths" | "english" | "science") => dnemisLgaData.reduce((n, r) => n + estimatedCoreGapsFromDnemis(r)[k], 0);
+
+  const summaryCards = [
+    {
+      label: "Extra teachers needed (est.)", value: dnemisTotals.subjectGaps.toLocaleString(), border: "border-l-warning",
+      rows: [
+        { label: "The number", value: `${dnemisTotals.subjectGaps.toLocaleString()} (est.)`, explain: `Added up across all LGAs: the teachers needed to reach ${DNEMIS_LTR_STANDARD} learners for every teacher, minus the teachers already in place.` },
+        { label: "Split by subject (est.)", explain: `Maths ${subjectSum("maths").toLocaleString()}, English ${subjectSum("english").toLocaleString()}, Science ${subjectSum("science").toLocaleString()}. The census has no subject data, so EduMap splits the total 36%, 34% and 30%.` },
+      ],
+    },
+    {
+      label: "State learners per teacher", value: ratioWords(stateLtr), border: "border-l-destructive",
+      rows: [
+        { label: "The number", value: ratioWords(stateLtr), explain: `${dnemisTotals.learners.toLocaleString()} learners divided by ${dnemisTotals.teachers.toLocaleString()} teachers across Kebbi State.` },
+        { label: "Compared with the standard", explain: `The Kebbi UBE standard is ${DNEMIS_LTR_STANDARD} learners for every teacher. A state average can hide LGAs that are far worse, which is why the table below is by LGA.` },
+      ],
+    },
+    {
+      label: "LGAs above the standard", value: `${aboveStandard} of ${dnemisLgaData.length}`, border: "border-l-accent",
+      rows: [
+        { label: "The number", value: `${aboveStandard} of ${dnemisLgaData.length}`, explain: `LGAs where learners per teacher is higher than ${DNEMIS_LTR_STANDARD} learners for every teacher.` },
+        { label: "What it means", explain: "In these LGAs there are more learners for each teacher than the standard allows, so classes are likely larger than planned." },
+      ],
+    },
+  ];
+  return (
   <div className="space-y-5 animate-fade-in">
     <div className="bg-accent/15 border border-accent/40 rounded-md p-4 flex items-start gap-3">
       <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
@@ -58,7 +60,31 @@ const TeacherGapsTab = () => (
       ))}
     </div>
 
-    <div className="bg-card rounded-md shadow-sm overflow-x-auto">
+    <div className="sm:hidden space-y-3">
+      {dnemisLgaData.map(lga => {
+        const gaps = estimatedCoreGapsFromDnemis(lga);
+        const est = <span className="text-xs text-muted-foreground"> (est.)</span>;
+        return (
+          <RowCard
+            key={lga.lga}
+            title={<>{lga.lga}<PilotBadge lga={lga.lga} /></>}
+            badges={<span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${urgencyClass[lga.urgency]}`}>{statusWord(lga.urgency)}</span>}
+            rows={[
+              { label: "Learners for every teacher", value: Math.round(lga.ltr) },
+              { label: "Schools", value: lga.schools.toLocaleString() },
+              { label: "Learners", value: lga.learners.toLocaleString() },
+              { label: "Teachers", value: lga.teachers.toLocaleString() },
+              { label: "Female teachers", value: `${lga.femaleTeachersPct.toFixed(1)}%` },
+              { label: "Maths gap", value: <>{gaps.maths.toLocaleString()}{est}</> },
+              { label: "English gap", value: <>{gaps.english.toLocaleString()}{est}</> },
+              { label: "Science gap", value: <>{gaps.science.toLocaleString()}{est}</> },
+            ]}
+          />
+        );
+      })}
+    </div>
+
+    <div className="hidden sm:block bg-card rounded-md shadow-sm overflow-x-auto">
       <table className="w-full text-sm font-body">
         <thead>
           <tr className="bg-muted text-left">
@@ -70,7 +96,7 @@ const TeacherGapsTab = () => (
             <th className="px-4 py-3 font-display font-semibold">Maths Gap</th>
             <th className="px-4 py-3 font-display font-semibold">English Gap</th>
             <th className="px-4 py-3 font-display font-semibold">Science Gap</th>
-            <th className="px-4 py-3 font-display font-semibold">Learner-Teacher Ratio</th>
+            <th className="px-4 py-3 font-display font-semibold">Learners for every teacher</th>
             <th className="px-4 py-3 font-display font-semibold">Urgency</th>
           </tr>
         </thead>
@@ -87,9 +113,9 @@ const TeacherGapsTab = () => (
                 <td className="px-4 py-3">{gaps.maths.toLocaleString()} <span className="text-xs text-muted-foreground">(est.)</span></td>
                 <td className="px-4 py-3">{gaps.english.toLocaleString()} <span className="text-xs text-muted-foreground">(est.)</span></td>
                 <td className="px-4 py-3">{gaps.science.toLocaleString()} <span className="text-xs text-muted-foreground">(est.)</span></td>
-                <td className="px-4 py-3">1:{lga.ltr.toFixed(1)}</td>
+                <td className="px-4 py-3">{Math.round(lga.ltr)}</td>
                 <td className="px-4 py-3">
-                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${urgencyClass[lga.urgency]}`}>{lga.urgency}</span>
+                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${urgencyClass[lga.urgency]}`}>{statusWord(lga.urgency)}</span>
                 </td>
               </tr>
             );
@@ -98,9 +124,10 @@ const TeacherGapsTab = () => (
       </table>
     </div>
     <p className="text-xs text-muted-foreground font-body">
-      Subject-gap estimate only: additional teachers needed to reach the Kebbi UBE standard of 1:{DNEMIS_LTR_STANDARD} are allocated 36% to Maths, 34% to English and 30% to Science. DNEMIS does not publish subject-level staffing in this dataset.
+      Subject-gap estimate only: additional teachers needed to reach the Kebbi UBE standard of {DNEMIS_LTR_STANDARD} learners for every teacher are allocated 36% to Maths, 34% to English and 30% to Science. DNEMIS does not publish subject-level staffing in this dataset.
     </p>
   </div>
-);
+  );
+};
 
 export default TeacherGapsTab;
