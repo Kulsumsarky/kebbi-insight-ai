@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import { YEAR_DATA, resolveYear } from "@/data/years";
 import { buildYearView, type YearView } from "@/data/yearView";
@@ -23,6 +23,14 @@ export const YearProvider = ({ children }: { children: ReactNode }) => {
     },
     [params, setParams],
   );
+  // Make sure the URL always shows the year being displayed (for example ?year=2024).
+  useEffect(() => {
+    if (params.get("year") !== String(year)) {
+      const copy = new URLSearchParams(params);
+      copy.set("year", String(year));
+      setParams(copy, { replace: true });
+    }
+  }, [params, year, setParams]);
   const view = useMemo(() => buildYearView(YEAR_DATA[year]), [year]);
   const value = useMemo(() => ({ year, setYear, view }), [year, setYear, view]);
   return <YearContext.Provider value={value}>{children}</YearContext.Provider>;
