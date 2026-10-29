@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Header from "@/components/Header";
-import RoleSelector from "@/components/RoleSelector";
 import TabNav from "@/components/TabNav";
 import OverviewTab from "@/components/tabs/OverviewTab";
 import TeacherGapsTab from "@/components/tabs/TeacherGapsTab";
@@ -35,13 +34,17 @@ const DashboardPage = () => {
       <Header />
       <YearSelect />
       {PUBLIC_DEMO_MODE && <FeedbackPrompt />}
-      <RoleSelector />
       <TabNav labels={visibleTabs.map((t) => t.label)} activeTab={activeTab} onTabChange={setActiveTab} />
       <main className="container py-6 flex-1">
         <ActiveComponent />
       </main>
       <footer className="border-t border-border bg-card">
         <div className="container py-4 space-y-1">
+          {PUBLIC_DEMO_MODE && (
+            <p className="text-xs text-muted-foreground font-body">
+              <strong>Demo preview.</strong> Figures marked (est.) are estimates while real data is collected.
+            </p>
+          )}
           <p className="text-xs text-muted-foreground font-body">{source}</p>
           <p className="text-xs text-muted-foreground font-body">{PARTIAL_DATA_NOTE}</p>
           <div className="pt-3">
